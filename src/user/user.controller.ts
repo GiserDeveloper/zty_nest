@@ -23,7 +23,8 @@ export class UserController {
     @Get()
     @ApiOperation({summary: '显示所有用户'})
     getUser(){
-        return this.userService.findAll();
+        //return this.userService.findAll();
+        return this.userService.findAllUserRole();
     }
 
     @Get(':userId')
