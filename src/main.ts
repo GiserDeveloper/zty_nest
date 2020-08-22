@@ -4,6 +4,7 @@ import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { logger } from './common/middleware/logger.middleware';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { TransformInterceptor } from './common/interceptor/transform.interceptor';
 
 
 async function bootstrap() {
@@ -17,6 +18,9 @@ async function bootstrap() {
 
   //全局使用异常过滤器
   app.useGlobalFilters(new HttpExceptionFilter())
+
+  //全局使用拦截器
+  app.useGlobalInterceptors(new TransformInterceptor())
 
   const options = new DocumentBuilder()
   .setTitle('NestJS-麻雀接口')
