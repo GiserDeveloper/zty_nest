@@ -64,8 +64,24 @@ export class NoticeService {
         return await this.noticeModel.deleteMany({_id: {$in: idArr}});
     }
 
-    //查询公告(条件查询)
+    //查询公告(条件查询)[不分页]
     async findNotices(query: object){
         return await this.noticeModel.find(query); 
+    }
+
+    //查询公告(分页)
+    async findNoticesByPages(query: object, page: number, limit: number){
+        return await this.noticeModel.find(query).countDocuments().then((count)=>{
+            //计算总页数
+            let pages = Math.ceil(count / limit);
+            //取值不能超过pages
+            page = Math.min(page, pages);
+            //取值不能小于1
+            page = Math.max(page, 1);
+            
+            let skip = (page-1) * limit;
+
+            return this.noticeModel.find(query).limit(limit).skip(skip)
+        });
     }
 }

@@ -238,3 +238,29 @@ export class NoticeDto{
     中标单位: string;
 
 }
+
+export class NoticeQueryPageDto{
+    @IsString()
+    @ApiProperty({
+        required: false
+    })
+    proviceName: string;
+
+    @IsString()
+    @ApiProperty({
+        required: false
+    })
+    typeName: string;
+
+    @IsNumber()
+    @ApiProperty({
+        required: false
+    })
+    page: number;
+
+    @IsNumber()
+    @ApiProperty({
+        required: false
+    })
+    limit: number;
+}
