@@ -21,6 +21,12 @@ export class LayerDto{
     })
     isDefaultLayer: boolean;
 
+    @IsBoolean()
+    @ApiProperty({
+        description: '是否可见'
+    })
+    isVisible: boolean;
+
     @IsObject()
     @ApiProperty({
         description: '图层字段列表'

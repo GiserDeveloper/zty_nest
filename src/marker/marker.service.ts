@@ -37,9 +37,6 @@ export class MarkerService {
         }
     }
 
-    // 查询所有点 - 带详细信息
-
-
     // 查询给定图层name的点
     async findMarkerByLayerName(layerName){
         return await this.markerModel.find({layer_name: layerName});

@@ -27,7 +27,7 @@ export class MarkerController {
     }
 
     @Get()
-    @ApiOperation({summary:'查找全部'})
+    @ApiOperation({summary:'查找全部点及其详细信息'})
     getAllMarkers(){
         return this.markerService.findAllMarkers();
     }

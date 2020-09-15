@@ -19,6 +19,9 @@ export class Layer extends Document {
     isDefaultLayer: boolean;
 
     @Prop()
+    isVisible: boolean;
+
+    @Prop()
     fieldList: string[];
 
 }

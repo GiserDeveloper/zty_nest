@@ -15,5 +15,11 @@ export class MapController {
     createMap(@Body() mapDto: MapDto){
         return this.mapService.create(mapDto);
     }
+
+    @Get()
+    @ApiOperation({summary: '查找所有地图'})
+    findAllMaps(){
+        return this.mapService.findAllMaps()
+    }
 }
 

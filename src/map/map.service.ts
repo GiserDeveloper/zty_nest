@@ -12,5 +12,9 @@ export class MapService {
         const createdMap = new this.mapModel(mapDto);
         return await createdMap.save();
     }
+
+    async findAllMaps(){
+        return await this.mapModel.find()
+    }
 }
 

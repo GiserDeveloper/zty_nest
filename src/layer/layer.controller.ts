@@ -15,4 +15,10 @@ export class LayerController {
     createLayer(@Body() layerDto: LayerDto){
         return this.layerService.create(layerDto);
     }
+
+    @Get()
+    @ApiOperation({summary: '查找所有图层'})
+    findAllLayers(){
+        return this.layerService.findAllLayers()
+    }
 }
