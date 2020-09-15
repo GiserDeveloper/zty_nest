@@ -7,6 +7,9 @@ import { RoleModule } from './role/role.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config'
 import { NoticeModule } from './notice/notice.module';
+import { LayerModule } from './layer/layer.module';
+import { MarkerModule } from './marker/marker.module';
+import { MapModule } from './map/map.module';
 
 @Module({
   imports: [MongooseModule.forRoot('mongodb://localhost:27017/zty',{
@@ -17,7 +20,7 @@ import { NoticeModule } from './notice/notice.module';
     }), UserModule, RoleModule, AuthModule, 
     ConfigModule.forRoot({
       isGlobal: true
-    }), NoticeModule
+    }), NoticeModule, LayerModule, MarkerModule, MapModule
   ],
   controllers: [AppController],
   providers: [AppService],
