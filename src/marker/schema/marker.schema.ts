@@ -31,7 +31,16 @@ export class Marker extends Document {
     callout: object;
 
     @Prop()
+    markerName: string;
+
+    @Prop()
     layer_name: string;
+
+    @Prop()
+    map_name: string;
+
+    @Prop()
+    markerField: object
 }
 
 export const MarkerSchema = SchemaFactory.createForClass(Marker);

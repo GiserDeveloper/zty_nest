@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNumber, IsBoolean } from 'class-validator';
+import { IsString, IsNumber, IsBoolean, IsObject } from 'class-validator';
 
 export class LayerDto{
 
@@ -20,5 +20,11 @@ export class LayerDto{
         description: '是否是默认图层'
     })
     isDefaultLayer: boolean;
+
+    @IsObject()
+    @ApiProperty({
+        description: '图层字段列表'
+    })
+    fieldList: string[];
 
 }

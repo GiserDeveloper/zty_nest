@@ -35,7 +35,7 @@ export class NoticeController {
         return this.noticeService.createBianGeng(jieguoDto);
     }
 
-    @Put(':zhaobiaoId')
+    @Put('zhaobiao/:zhaobiaoId')
     @ApiParam({
         name: 'zhaobiaoId',
         description: '请传入招标公告Id'
@@ -45,7 +45,7 @@ export class NoticeController {
         return this.noticeService.updateZhaoBiaoById(id, zhaobiaoDto);
     }
 
-    @Put(':houxuanId')
+    @Put('houxuan/:houxuanId')
     @ApiParam({
         name: 'houxuanId',
         description: '请传入候选人公告Id'
@@ -55,7 +55,7 @@ export class NoticeController {
         return this.noticeService.updateHouXuanById(id, houxuanDto);
     }
 
-    @Put(':biangengId')
+    @Put('biangeng:biangengId')
     @ApiParam({
         name: 'biangengId',
         description: '请传入变更公告Id'
@@ -65,7 +65,7 @@ export class NoticeController {
         return this.noticeService.updateBianGengById(id, biangengDto);
     }
 
-    @Put(':jieguoId')
+    @Put('jieguo/:jieguoId')
     @ApiParam({
         name: 'jieguoId',
         description: '请传入结果公告Id'

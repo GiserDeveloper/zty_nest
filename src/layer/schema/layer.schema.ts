@@ -17,6 +17,10 @@ export class Layer extends Document {
 
     @Prop()
     isDefaultLayer: boolean;
+
+    @Prop()
+    fieldList: string[];
+
 }
 
 export const LayerSchema = SchemaFactory.createForClass(Layer);

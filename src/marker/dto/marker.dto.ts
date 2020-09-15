@@ -1,6 +1,6 @@
 import { Post } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNumber, IsBoolean, IsObject } from 'class-validator';
+import { IsString, IsNumber, IsBoolean, IsObject, IsArray } from 'class-validator';
 
 export class MarkerDto{
 
@@ -48,9 +48,27 @@ export class MarkerDto{
 
     @IsString()
     @ApiProperty({
+        description: '元素额外属性（标记名称）'
+    })
+    markerName: string;
+
+    @IsString()
+    @ApiProperty({
         description: '元素额外属性（图层名称）'
     })
     layer_name: string;
+
+    @IsString()
+    @ApiProperty({
+        description: '元素额外属性（地图名称）'
+    })
+    map_name: string;
+
+    @IsArray()
+    @ApiProperty({
+        description: '元素额外属性（marker详细信息）'
+    })
+    markerField: object;
 
 }
 

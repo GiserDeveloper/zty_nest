@@ -9,6 +9,7 @@ export class LayerService {
     constructor(@InjectModel('Layer') private layerModel: Model<Layer>) {}
 
     async create(layerDto: LayerDto): Promise<Layer> {
+        console.log(layerDto)
         const createdLayer = new this.layerModel(layerDto);
         return await createdLayer.save();
     }

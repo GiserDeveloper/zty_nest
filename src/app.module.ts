@@ -10,6 +10,7 @@ import { NoticeModule } from './notice/notice.module';
 import { LayerModule } from './layer/layer.module';
 import { MarkerModule } from './marker/marker.module';
 import { MapModule } from './map/map.module';
+import { CounterModule } from './counter/counter.module';
 
 @Module({
   imports: [MongooseModule.forRoot('mongodb://localhost:27017/zty',{
@@ -20,7 +21,7 @@ import { MapModule } from './map/map.module';
     }), UserModule, RoleModule, AuthModule, 
     ConfigModule.forRoot({
       isGlobal: true
-    }), NoticeModule, LayerModule, MarkerModule, MapModule
+    }), NoticeModule, LayerModule, MarkerModule, MapModule, CounterModule
   ],
   controllers: [AppController],
   providers: [AppService],
