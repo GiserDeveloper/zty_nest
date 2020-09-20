@@ -40,3 +40,24 @@ export class LayerDto{
     fieldList: string[];
 
 }
+
+export class modifyLayerFieldDto{
+
+    @IsString()
+    @ApiProperty({
+        description: '修改的图层名称'
+    })
+    modifyLayerName: string;
+
+    @IsString()
+    @ApiProperty({
+        description: '修改的图层字段FieldList'
+    })
+    modifyFieldName: string;
+
+    @IsString()
+    @ApiProperty({
+        description: '指定修改字段的名称'
+    })
+    modifyFieldNameCon: string;
+}

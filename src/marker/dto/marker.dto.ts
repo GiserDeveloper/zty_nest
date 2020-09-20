@@ -72,3 +72,23 @@ export class MarkerDto{
 
 }
 
+export class modifyMarkerFieldDto{
+
+    @IsString()
+    @ApiProperty({
+        description: '修改的图层名称'
+    })
+    modifyLayerName: string;
+
+    @IsString()
+    @ApiProperty({
+        description: 'FieldList'
+    })
+    modifyFieldName: string;
+
+    @IsString()
+    @ApiProperty({
+        description: '指定修改字段的名称'
+    })
+    modifyFieldNameCon: string;
+}

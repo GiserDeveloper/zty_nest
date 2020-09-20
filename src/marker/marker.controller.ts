@@ -1,19 +1,19 @@
 import { Controller, Post, Body, Get, Param, Put, Delete, UsePipes, ValidationPipe, UseGuards, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { MarkerService } from './marker.service';
-import { MarkerDto } from './dto/marker.dto';
-import { identity } from 'rxjs';
+import { MarkerDto, modifyMarkerFieldDto } from './dto/marker.dto';
+
 
 @Controller('marker')
 @ApiTags('标记点模块')
 export class MarkerController {
     constructor(
         private readonly markerService: MarkerService
-    ){}
+    ) { }
 
     @Post()
-    @ApiOperation({summary: '创建新标记点'})
-    createMarker(@Body() markerDto: MarkerDto){
+    @ApiOperation({ summary: '创建新标记点' })
+    createMarker(@Body() markerDto: MarkerDto) {
         return this.markerService.create(markerDto);
     }
 
@@ -22,14 +22,14 @@ export class MarkerController {
         name: 'layerName',
         description: '请传入图层名称'
     })
-    @ApiOperation({summary: '根据图层查找点'})
-    getUserById(@Param('layerName') layerName){
+    @ApiOperation({ summary: '根据图层查找点' })
+    getUserById(@Param('layerName') layerName) {
         return this.markerService.findMarkerByLayerName(layerName);
     }
 
     @Get()
-    @ApiOperation({summary:'查找全部点及其详细信息'})
-    getAllMarkers(){
+    @ApiOperation({ summary: '查找全部点及其详细信息' })
+    getAllMarkers() {
         return this.markerService.findAllMarkers();
     }
 
@@ -40,7 +40,7 @@ export class MarkerController {
     @ApiOperation({
         summary: '根据一组图层参数查询点数据'
     })
-    getMarkersByMultiLayers(@Query('layerNames') layerNames){
+    getMarkersByMultiLayers(@Query('layerNames') layerNames) {
         // 字符串转数组
         let queryArr = JSON.stringify(layerNames.split(','));
         return this.markerService.findMarkerByMultiLayerNames(queryArr);
@@ -49,8 +49,8 @@ export class MarkerController {
     @Get('findMarkerActive')
     @ApiOperation({
         summary: '查询处于激活状态的点数据'
-    })    
-    getMarkersActive(){
+    })
+    getMarkersActive() {
         return this.markerService.findMarkerActive();
     }
 
@@ -61,9 +61,38 @@ export class MarkerController {
     })
     @ApiOperation({
         summary: '根据ID查询点的详细信息'
-    })    
-    queryMarkerByID(@Param('id') id){
+    })
+    queryMarkerByID(@Param('id') id) {
         return this.markerService.queryMarkerByID(id);
+    }
+
+    // 新增点字段
+    @Post('addMarkerField')
+    @ApiOperation({
+        summary: '新增点字段'
+    })
+    addLayerField(@Body() addMarkerFieldContent: modifyMarkerFieldDto) {
+        return this.markerService.addMarkerField(addMarkerFieldContent, addMarkerFieldContent.modifyLayerName)
+    }
+
+    // 删除点字段
+    @Post('deleteMarkerField')
+    @ApiOperation({
+        summary: '删除点字段'
+    })
+    deleteMarkerField(@Body() deleteMarkerFieldContent: modifyMarkerFieldDto){
+        return this.markerService.deleteMarkerField(deleteMarkerFieldContent, deleteMarkerFieldContent.modifyLayerName)
+    }
+
+    // 修改点数据-部分字段
+    @Put('modify')
+    @ApiQuery({
+        name: 'markerName',
+        description: '请传入待修改点名字'
+    })
+    @ApiOperation({ summary: '修改点数据' })
+    modifyMarker(@Query('markerName') query, @Body() updateContent: MarkerDto) {
+        return this.markerService.modifyMarker(query, updateContent);
     }
 
 }

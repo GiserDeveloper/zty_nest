@@ -1,7 +1,7 @@
 import { Controller, Post, Body, Get, Param, Put, Delete, UsePipes, ValidationPipe, UseGuards, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { LayerService } from './layer.service';
-import { LayerDto } from './dto/layer.dto';
+import { LayerDto, modifyLayerFieldDto } from './dto/layer.dto';
 
 @Controller('layer')
 @ApiTags('地图图层模块')
@@ -43,5 +43,29 @@ export class LayerController {
     findLayerInfoByName(@Param('layerName') layerName){
         return this.layerService.findLayerInfoByName(layerName);
     }
+
+    // 新增图层字段
+    @Post('addLayerField')
+    @ApiOperation({
+        summary: '新增图层字段'
+    })
+    addLayerField(@Body() addLayerFieldContent: modifyLayerFieldDto){
+        let addLayerFieldObj = {}
+        addLayerFieldObj[addLayerFieldContent.modifyFieldName] = addLayerFieldContent.modifyFieldNameCon
+        let modifyLayerName = addLayerFieldContent.modifyLayerName;
+        return this.layerService.addLayerField(addLayerFieldObj, modifyLayerName)
+    }
+
+    // 删除图层字段
+    @Post('deleteLayerField')
+    @ApiOperation({
+        summary: '删除图层字段'
+    })
+    deleteLayerField(@Body() deleteLayerFieldContent: modifyLayerFieldDto){
+        let deleteLayerFieldObj = {}
+        deleteLayerFieldObj[deleteLayerFieldContent.modifyFieldName] = deleteLayerFieldContent.modifyFieldNameCon
+        let modifyLayerName = deleteLayerFieldContent.modifyLayerName;
+        return this.layerService.deleteLayerField(deleteLayerFieldObj, modifyLayerName)
+    }   
 
 }

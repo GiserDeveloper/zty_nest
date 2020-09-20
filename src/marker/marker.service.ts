@@ -2,7 +2,7 @@ import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Marker } from './schema/marker.schema';
-import { MarkerDto } from './dto/marker.dto';
+import { MarkerDto, modifyMarkerFieldDto } from './dto/marker.dto';
 
 import { Counter } from 'src/counter/schema/counter.schema';
 import { Layer } from 'src/layer/schema/layer.schema';
@@ -15,14 +15,14 @@ export class MarkerService {
         @InjectModel('Counter') private counterModel: Model<Counter>,
         @InjectModel('Layer') private layerModel: Model<Layer>,
         @InjectModel('Map') private mapModel: Model<Map>
-    ) {}
+    ) { }
 
     // 返回带自增id的数据
-    async create(markerDto: any){
+    async create(markerDto: any) {
         try {
             let counter = await this.counterModel.findOneAndUpdate(
-                { _id: 'markerIdSeqGenerator'},
-                { $inc: {seq:1}},
+                { _id: 'markerIdSeqGenerator' },
+                { $inc: { seq: 1 } },
                 {
                     new: true,
                     upsert: true
@@ -32,29 +32,29 @@ export class MarkerService {
             try {
                 return await this.markerModel.create(markerDto)
             } catch (error) {
-                
+
             }
         } catch (error) {
-            
+
         }
     }
 
     // 查询给定图层name的点
-    async findMarkerByLayerName(layerName){
-        return await this.markerModel.find({layer_name: layerName});
+    async findMarkerByLayerName(layerName) {
+        return await this.markerModel.find({ layer_name: layerName });
     }
 
     // 查找所有的点
-    async findAllMarkers(){
+    async findAllMarkers() {
         return await this.markerModel.find();
     }
 
     // 查询给定一组图层name的点
-    async findMarkerByMultiLayerNames(layerNames){
+    async findMarkerByMultiLayerNames(layerNames) {
         const result = [];
-        await this.markerModel.find(null,(err,doc)=>{
-            doc.map((value)=>{
-                if(layerNames.includes(value.layer_name)){
+        await this.markerModel.find(null, (err, doc) => {
+            doc.map((value) => {
+                if (layerNames.includes(value.layer_name)) {
                     result.push(value);
                 }
             })
@@ -63,10 +63,10 @@ export class MarkerService {
     }
 
     // 查询 处于激活状态的 地图 的 可见的图层的点数据
-    async findMarkerActive(){
+    async findMarkerActive() {
         return await this.markerModel.aggregate([
             {
-                $lookup:{
+                $lookup: {
                     from: "layers",
                     localField: "layer_name",
                     foreignField: "layerName",
@@ -74,7 +74,7 @@ export class MarkerService {
                 }
             },
             {
-                $lookup:{
+                $lookup: {
                     from: "maps",
                     localField: "map_name",
                     foreignField: "mapName",
@@ -91,8 +91,46 @@ export class MarkerService {
     }
 
     // 根据点的ID查询点信息
-    async queryMarkerByID(id){
-        return await this.markerModel.findOne({id: id});
+    async queryMarkerByID(id) {
+        return await this.markerModel.findOne({ id: id });
+    }
+
+    // 新增点的字段
+    async addMarkerField(addMarkerProperty, modifyLayerName) {
+        // 批量更新
+        let tmp = {}
+        tmp[`markerField.${addMarkerProperty.modifyFieldName}`] = addMarkerProperty.modifyFieldNameCon
+        console.log(tmp)
+        return await this.markerModel.updateMany({
+            layer_name: modifyLayerName
+        }, tmp, (err) => { })
+    }
+
+    // 删除点的字段
+    async deleteMarkerField(deleteMarkerProperty, modifyLayerName){
+        let unset = {}
+        unset[`markerField.${deleteMarkerProperty.modifyFieldName}`] = ""
+        console.log(modifyLayerName, unset)
+        return await this.markerModel.updateMany({
+            layer_name: modifyLayerName
+        }, {
+            $unset: unset
+        })
+    }
+
+    // 修改点信息-字段
+    async modifyMarker(query, updateContent) {
+        return await this.markerModel.findOneAndUpdate(
+            {
+                markerName: query
+            },
+            {
+                $set: updateContent
+            },
+            {
+                new: true
+            }
+        )
     }
 
 }
