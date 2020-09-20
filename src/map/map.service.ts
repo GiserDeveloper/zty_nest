@@ -16,5 +16,20 @@ export class MapService {
     async findAllMaps(){
         return await this.mapModel.find()
     }
+
+    // 修改图层信息-字段
+    async modifyMap(query, updateContent){
+        return await this.mapModel.findOneAndUpdate(
+            {
+                mapName: query
+            },
+            {
+                $set: updateContent
+            },
+            {
+                new: true
+            }
+        )
+    }
 }
 

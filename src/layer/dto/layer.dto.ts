@@ -27,6 +27,12 @@ export class LayerDto{
     })
     isVisible: boolean;
 
+    @IsNumber()
+    @ApiProperty({
+        description: '点的数量'
+    })
+    markerCount: number;
+
     @IsObject()
     @ApiProperty({
         description: '图层字段列表'

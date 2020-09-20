@@ -22,6 +22,9 @@ export class Layer extends Document {
     isVisible: boolean;
 
     @Prop()
+    markerCount: number;
+
+    @Prop()
     fieldList: string[];
 
 }

@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiQuery } from '@nestjs/swagger';
 import { IsString, IsNumber, IsBoolean } from 'class-validator';
 
 export class MapDto{
@@ -14,5 +14,11 @@ export class MapDto{
         description: '是否处于激活状态'
     })
     isActive: boolean;
+
+    @IsNumber()
+    @ApiProperty({
+        description: '包含图层数量'
+    })
+    layerCount: number;
 
 }
