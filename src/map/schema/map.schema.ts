@@ -7,7 +7,9 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export class Map extends Document {
 
-    @Prop()
+    @Prop({
+        unique: true
+    })
     mapName: string;
 
     @Prop()

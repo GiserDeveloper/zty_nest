@@ -100,7 +100,6 @@ export class MarkerService {
         // 批量更新
         let tmp = {}
         tmp[`markerField.${addMarkerProperty.modifyFieldName}`] = addMarkerProperty.modifyFieldNameCon
-        console.log(tmp)
         return await this.markerModel.updateMany({
             layer_name: modifyLayerName
         }, tmp, (err) => { })
@@ -110,7 +109,6 @@ export class MarkerService {
     async deleteMarkerField(deleteMarkerProperty, modifyLayerName){
         let unset = {}
         unset[`markerField.${deleteMarkerProperty.modifyFieldName}`] = ""
-        console.log(modifyLayerName, unset)
         return await this.markerModel.updateMany({
             layer_name: modifyLayerName
         }, {
@@ -133,4 +131,50 @@ export class MarkerService {
         )
     }
 
+    // 根据图层信息修改点字段
+    async modifyMarkerByLayerName(query, updateContent) {
+        return await this.markerModel.updateMany(
+            {
+                layer_name: query
+            },
+            {
+                $set: updateContent
+            },
+            {
+                new: true
+            }
+        )
+    }
+
+    // 删除点
+    async deleteMarker(markerName){
+        return await this.markerModel.deleteOne({
+            markerName: markerName
+        })
+    }
+
+    // 根据图层删除点
+    async deleteMarkers(layerName){
+        return await this.markerModel.deleteMany({
+            layer_name: layerName
+        })
+    }
+
+    // 求markerCount
+    async test(){
+        return await this.markerModel.aggregate(
+            [
+                {
+                    $group:{
+                        _id: {
+                            layerName: '$layer_name'
+                        },
+                        count: {
+                            $sum: 1
+                        }
+                    }
+                }
+            ]
+        )
+    }
 }

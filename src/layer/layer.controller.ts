@@ -68,4 +68,25 @@ export class LayerController {
         return this.layerService.deleteLayerField(deleteLayerFieldObj, modifyLayerName)
     }   
 
+    // 根据地图查找图层
+    @Get('map/:mapName')
+    @ApiParam({
+        name: 'mapName',
+        description: '请传入地图名称' 
+    })
+    @ApiOperation({summary: '根据地图名称查询图层数据'})
+    findLayerInfoByMapName(@Param('mapName') mapName){
+        return this.layerService.findLayerByMap(mapName);
+    }
+
+    @Delete(':layerName')
+    @ApiParam({
+        name: 'layerName',
+        description: '请传入图层名称'
+    })
+    @ApiOperation({summary: '传入图层名称删除图层'})
+    deleteLayerByName(@Param('layerName') layerName){
+        return this.layerService.deleteLayer(layerName);
+    }
+
 }

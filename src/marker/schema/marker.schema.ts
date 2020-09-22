@@ -30,7 +30,9 @@ export class Marker extends Document {
     @Prop()
     callout: object;
 
-    @Prop()
+    @Prop({
+        unique: true
+    })
     markerName: string;
 
     @Prop()

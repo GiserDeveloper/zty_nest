@@ -60,4 +60,18 @@ export class LayerService {
             layerName: modifyLayerName
         },tmp,{new: true})
     }
+
+    // 根据地图查找图层
+    async findLayerByMap(mapName){
+        return await this.layerModel.find({
+            map_name: mapName
+        })
+    }
+
+    // 删除图层
+    async deleteLayer(layerName){
+        return await this.layerModel.deleteOne({
+            layerName: layerName
+        })
+    }
 }

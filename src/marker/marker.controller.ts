@@ -95,5 +95,43 @@ export class MarkerController {
         return this.markerService.modifyMarker(query, updateContent);
     }
 
+    // 根据图层名称修改点字段
+    @Put('modifyByLayer')
+    @ApiQuery({
+        name: 'layerName',
+        description: '请传入修改的图层名字'
+    })
+    @ApiOperation({ summary: '修改点数据-通过图层' })
+    modifyMarkerByLayer(@Query('layerName') query, @Body() updateContent: MarkerDto) {
+        return this.markerService.modifyMarkerByLayerName(query, updateContent);
+    }
+
+
+    @Delete(':markerName')
+    @ApiParam({
+        name: 'markerName',
+        description: '请传入点名称'
+    })
+    @ApiOperation({summary: '传入点名称删除点'})
+    deleteMarkerByName(@Param('markerName') markerName){
+        return this.markerService.deleteMarker(markerName);
+    }
+
+    @Delete('multi/:layerName')
+    @ApiParam({
+        name: 'layerName',
+        description: '请传入图层名称'
+    })
+    @ApiOperation({summary: '传入图层名称删除点'})
+    deleteMarkersByLayerName(@Param('layerName') layerName){
+        return this.markerService.deleteMarkers(layerName);
+    }  
+
+    @Get('test')
+    @ApiOperation({summary: 'test'})
+    test(){
+        return this.markerService.test()
+    }
+
 }
 
