@@ -1,12 +1,14 @@
-import { Model } from 'mongoose';
+import { Model, Mongoose } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Marker } from './schema/marker.schema';
+import { Marker, MarkerSchema } from './schema/marker.schema';
 import { MarkerDto, modifyMarkerFieldDto } from './dto/marker.dto';
 
 import { Counter } from 'src/counter/schema/counter.schema';
 import { Layer } from 'src/layer/schema/layer.schema';
 import { Map } from 'src/map/schema/map.schema';
+
+let mongoose=require('mongoose');
 
 @Injectable()
 export class MarkerService {
@@ -29,6 +31,7 @@ export class MarkerService {
                 }
             )
             markerDto.id = counter.seq;
+            markerDto.layer_id = mongoose.Types.ObjectId(markerDto.layer_id)
             try {
                 return await this.markerModel.create(markerDto)
             } catch (error) {
@@ -92,25 +95,55 @@ export class MarkerService {
 
     // 根据点的ID查询点信息
     async queryMarkerByID(id) {
-        return await this.markerModel.findOne({ id: id });
+        let Id = Number(id)
+        return await this.markerModel.aggregate([
+            {
+                $match:{
+                    id: Id
+                }
+            },
+            {
+                $lookup: {
+                    from: "layers",
+                    localField: "layer_id",
+                    foreignField: "_id",
+                    as: "layerInfo"
+                }
+            }
+        ]);
     }
 
     // 新增点的字段
-    async addMarkerField(addMarkerProperty, modifyLayerName) {
+    async addMarkerField(addMarkerProperty, modifyLayerId) {
+        let modifyLayerID = mongoose.Types.ObjectId(modifyLayerId)
         // 批量更新
         let tmp = {}
         tmp[`markerField.${addMarkerProperty.modifyFieldName}`] = addMarkerProperty.modifyFieldNameCon
         return await this.markerModel.updateMany({
-            layer_name: modifyLayerName
+            layer_id: modifyLayerID
         }, tmp, (err) => { })
     }
 
+    async addMarkerField2(addMarkerProperty, modifyLayerName){
+        // 批量更新
+        let tmp = {}
+        tmp[addMarkerProperty.modifyFieldName] = mongoose.Types.ObjectId(addMarkerProperty.modifyFieldNameCon)
+        console.log(tmp)
+        console.log(mongoose.Types.ObjectId.isValid(tmp[addMarkerProperty.modifyFieldName]))
+        return await this.markerModel.updateMany({
+            layer_name: modifyLayerName
+        }, {
+            $set: tmp
+        }, (err) => { })
+    }
+
     // 删除点的字段
-    async deleteMarkerField(deleteMarkerProperty, modifyLayerName){
+    async deleteMarkerField(deleteMarkerProperty, modifyLayerId){
+        let modifyLayerID = mongoose.Types.ObjectId(modifyLayerId)
         let unset = {}
         unset[`markerField.${deleteMarkerProperty.modifyFieldName}`] = ""
         return await this.markerModel.updateMany({
-            layer_name: modifyLayerName
+            layer_id: modifyLayerID
         }, {
             $unset: unset
         })
@@ -118,9 +151,10 @@ export class MarkerService {
 
     // 修改点信息-字段
     async modifyMarker(query, updateContent) {
+        updateContent.layer_id = mongoose.Types.ObjectId(updateContent.layer_id)
         return await this.markerModel.findOneAndUpdate(
             {
-                markerName: query
+                id: query
             },
             {
                 $set: updateContent
@@ -147,16 +181,17 @@ export class MarkerService {
     }
 
     // 删除点
-    async deleteMarker(markerName){
+    async deleteMarker(markerId){
         return await this.markerModel.deleteOne({
-            markerName: markerName
+            id: markerId
         })
     }
 
-    // 根据图层删除点
-    async deleteMarkers(layerName){
+    // 根据图层删除点d
+    async deleteMarkers(layerId){
+        let layerID = mongoose.Types.ObjectId(layerId)
         return await this.markerModel.deleteMany({
-            layer_name: layerName
+            layer_id: layerID
         })
     }
 
@@ -176,5 +211,25 @@ export class MarkerService {
                 }
             ]
         )
+    }
+
+    // 返回激活的地图的layer-marker数据
+    testZTY(mapId){
+        let mapID =mongoose.Types.ObjectId(mapId)
+        return this.layerModel.aggregate([
+            {
+                $match:{
+                    map_id : mapID
+                }
+            },
+            {
+                $lookup: {
+                    from: "markers",
+                    localField: "_id",
+                    foreignField: "layer_id",
+                    as: "markerList"
+                }
+            }
+        ])
     }
 }

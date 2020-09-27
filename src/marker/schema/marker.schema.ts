@@ -2,7 +2,8 @@ import { Document } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 @Schema({
-    timestamps: true
+    timestamps: true,
+    strict: false
 })
 
 export class Marker extends Document {
@@ -42,7 +43,7 @@ export class Marker extends Document {
     map_name: string;
 
     @Prop()
-    markerField: object
+    markerField: object;
 }
 
 export const MarkerSchema = SchemaFactory.createForClass(Marker);

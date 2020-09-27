@@ -25,23 +25,23 @@ export class LayerController {
     // 修改图层数据-部分字段
     @Put('modify')
     @ApiQuery({
-        name: 'layerName',
-        description: '请传入待修改图层名字'
+        name: 'layerId',
+        description: '请传入待修改图层id'
     })
     @ApiOperation({summary: '修改图层数据'})
-    modifyLayer(@Query('layerName') query, @Body() updateContent:LayerDto){
+    modifyLayer(@Query('layerId') query, @Body() updateContent:LayerDto){
         return this.layerService.modifyLayer(query, updateContent);
     }
 
     // 根据图层名称查找图层
-    @Get(':layerName')
+    @Get(':layerId')
     @ApiParam({
-        name: 'layerName',
+        name: 'layerId',
         description: '请传入图层名称' 
     })
     @ApiOperation({summary: '根据图层名称查询图层数据'})
-    findLayerInfoByName(@Param('layerName') layerName){
-        return this.layerService.findLayerInfoByName(layerName);
+    findLayerInfoByName(@Param('layerId') layerId){
+        return this.layerService.findLayerInfoById(layerId);
     }
 
     // 新增图层字段
@@ -52,8 +52,8 @@ export class LayerController {
     addLayerField(@Body() addLayerFieldContent: modifyLayerFieldDto){
         let addLayerFieldObj = {}
         addLayerFieldObj[addLayerFieldContent.modifyFieldName] = addLayerFieldContent.modifyFieldNameCon
-        let modifyLayerName = addLayerFieldContent.modifyLayerName;
-        return this.layerService.addLayerField(addLayerFieldObj, modifyLayerName)
+        let modifyLayerId = addLayerFieldContent.modifyLayerId;
+        return this.layerService.addLayerField(addLayerFieldObj, modifyLayerId)
     }
 
     // 删除图层字段
@@ -64,8 +64,8 @@ export class LayerController {
     deleteLayerField(@Body() deleteLayerFieldContent: modifyLayerFieldDto){
         let deleteLayerFieldObj = {}
         deleteLayerFieldObj[deleteLayerFieldContent.modifyFieldName] = deleteLayerFieldContent.modifyFieldNameCon
-        let modifyLayerName = deleteLayerFieldContent.modifyLayerName;
-        return this.layerService.deleteLayerField(deleteLayerFieldObj, modifyLayerName)
+        let modifyLayerId = deleteLayerFieldContent.modifyLayerId;
+        return this.layerService.deleteLayerField(deleteLayerFieldObj, modifyLayerId)
     }   
 
     // 根据地图查找图层
@@ -79,14 +79,21 @@ export class LayerController {
         return this.layerService.findLayerByMap(mapName);
     }
 
-    @Delete(':layerName')
+    @Delete(':layerId')
     @ApiParam({
-        name: 'layerName',
-        description: '请传入图层名称'
+        name: 'layerId',
+        description: '请传入图层id'
     })
-    @ApiOperation({summary: '传入图层名称删除图层'})
-    deleteLayerByName(@Param('layerName') layerName){
-        return this.layerService.deleteLayer(layerName);
+    @ApiOperation({summary: '传入图层id删除图层'})
+    deleteLayerByName(@Param('layerId') layerId){
+        return this.layerService.deleteLayer(layerId);
     }
 
+    // @Post('addLayerField2')
+    // @ApiOperation({
+    //     summary: '新增点字段'
+    // })
+    // addLayerField2(@Body() deleteLayerFieldContent: modifyLayerFieldDto) {
+    //     return this.layerService.addLayerField2(deleteLayerFieldContent, deleteLayerFieldContent.modifyLayerId)
+    // }
 }

@@ -76,9 +76,9 @@ export class modifyMarkerFieldDto{
 
     @IsString()
     @ApiProperty({
-        description: '修改的图层名称'
+        description: '修改的图层id'
     })
-    modifyLayerName: string;
+    modifyLayerId: string;
 
     @IsString()
     @ApiProperty({

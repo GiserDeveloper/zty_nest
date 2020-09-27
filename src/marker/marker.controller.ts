@@ -72,7 +72,7 @@ export class MarkerController {
         summary: '新增点字段'
     })
     addLayerField(@Body() addMarkerFieldContent: modifyMarkerFieldDto) {
-        return this.markerService.addMarkerField(addMarkerFieldContent, addMarkerFieldContent.modifyLayerName)
+        return this.markerService.addMarkerField(addMarkerFieldContent, addMarkerFieldContent.modifyLayerId)
     }
 
     // 删除点字段
@@ -81,17 +81,17 @@ export class MarkerController {
         summary: '删除点字段'
     })
     deleteMarkerField(@Body() deleteMarkerFieldContent: modifyMarkerFieldDto){
-        return this.markerService.deleteMarkerField(deleteMarkerFieldContent, deleteMarkerFieldContent.modifyLayerName)
+        return this.markerService.deleteMarkerField(deleteMarkerFieldContent, deleteMarkerFieldContent.modifyLayerId)
     }
 
     // 修改点数据-部分字段
     @Put('modify')
     @ApiQuery({
-        name: 'markerName',
+        name: 'markerId',
         description: '请传入待修改点名字'
     })
     @ApiOperation({ summary: '修改点数据' })
-    modifyMarker(@Query('markerName') query, @Body() updateContent: MarkerDto) {
+    modifyMarker(@Query('markerId') query, @Body() updateContent: MarkerDto) {
         return this.markerService.modifyMarker(query, updateContent);
     }
 
@@ -107,24 +107,24 @@ export class MarkerController {
     }
 
 
-    @Delete(':markerName')
+    @Delete(':markerId')
     @ApiParam({
-        name: 'markerName',
-        description: '请传入点名称'
+        name: 'markerId',
+        description: '请传入点id'
     })
-    @ApiOperation({summary: '传入点名称删除点'})
-    deleteMarkerByName(@Param('markerName') markerName){
-        return this.markerService.deleteMarker(markerName);
+    @ApiOperation({summary: '传入点id删除点'})
+    deleteMarkerByName(@Param('markerId') markerId){
+        return this.markerService.deleteMarker(markerId);
     }
 
-    @Delete('multi/:layerName')
+    @Delete('multi/:layerId')
     @ApiParam({
-        name: 'layerName',
-        description: '请传入图层名称'
+        name: 'layerId',
+        description: '请传入图层id'
     })
-    @ApiOperation({summary: '传入图层名称删除点'})
-    deleteMarkersByLayerName(@Param('layerName') layerName){
-        return this.markerService.deleteMarkers(layerName);
+    @ApiOperation({summary: '传入图层id删除点'})
+    deleteMarkersByLayerId(@Param('layerId') layerId){
+        return this.markerService.deleteMarkers(layerId);
     }  
 
     @Get('test')
@@ -133,5 +133,26 @@ export class MarkerController {
         return this.markerService.test()
     }
 
+    // // 新增点字段
+    // @Post('addMarkerField2')
+    // @ApiOperation({
+    //     summary: '新增点字段'
+    // })
+    // addLayerField2(@Body() addMarkerFieldContent: modifyMarkerFieldDto) {
+    //     return this.markerService.addMarkerField2(addMarkerFieldContent, addMarkerFieldContent.modifyLayerName)
+    // }
+
+
+    @Get('testZty/:mapId')
+    @ApiParam({
+        name: 'mapId',
+        description: '请传入mapId'
+    })
+    @ApiOperation({
+        summary: '测试'
+    })
+    testZty(@Param('mapId') mapId){
+        return this.markerService.testZTY(mapId)
+    }
 }
 

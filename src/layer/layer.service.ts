@@ -5,6 +5,7 @@ import { Layer, LayerSchema } from './schema/layer.schema';
 import { LayerDto, modifyLayerFieldDto } from './dto/layer.dto';
 
 import { Marker } from '../marker/schema/marker.schema';
+let mongoose=require('mongoose');
 
 @Injectable()
 export class LayerService {
@@ -13,7 +14,8 @@ export class LayerService {
         @InjectModel('Marker') private markerModel: Model<Marker>
     ) {}
 
-    async create(layerDto: LayerDto): Promise<Layer> {
+    async create(layerDto): Promise<Layer> {
+        layerDto.map_id = mongoose.Types.ObjectId(layerDto.map_id)
         const createdLayer = new this.layerModel(layerDto);
         return await createdLayer.save();
     }
@@ -24,9 +26,11 @@ export class LayerService {
 
     // 修改图层信息-字段
     async modifyLayer(query, updateContent){
+        console.log(query,updateContent)
+        query = mongoose.Types.ObjectId(query)
         return await this.layerModel.findOneAndUpdate(
             {
-                layerName: query
+                _id: query
             },
             {
                 $set: updateContent
@@ -38,26 +42,43 @@ export class LayerService {
     }
 
     // 根据图层名称查找图层信息
-    async findLayerInfoByName(layerName){
-        return await this.layerModel.findOne({layerName: layerName})
+    async findLayerInfoById(layerId){
+        let layerID = mongoose.Types.ObjectId(layerId)
+        return await this.layerModel.findOne({_id: layerID})
     }
 
     // 新增图层字段
-    async addLayerField(addLayerProperty, modifyLayerName){
+    async addLayerField(addLayerProperty, modifyLayerId){
+        let modifyLayerID = mongoose.Types.ObjectId(modifyLayerId)
         // 批量更新
         let tmp = {}
         tmp['$addToSet'] = addLayerProperty
         return await this.layerModel.findOneAndUpdate({
-            layerName: modifyLayerName
+            _id: modifyLayerID
         },tmp,{new: true})
     }
 
+    // 
+    async addLayerField2(addLayerProperty, modifyLayerName){
+        // 批量更新
+        let tmp = {}
+        tmp[addLayerProperty.modifyFieldName] = mongoose.Types.ObjectId(addLayerProperty.modifyFieldNameCon)
+        console.log(tmp)
+        console.log(mongoose.Types.ObjectId.isValid(tmp[addLayerProperty.modifyFieldName]))
+        return await this.layerModel.updateMany({
+            layerName: modifyLayerName
+        }, {
+            $set: tmp
+        }, (err) => { })
+    }
+
     // 删除图层字段
-    async deleteLayerField(deleteLayerProperty, modifyLayerName){
+    async deleteLayerField(deleteLayerProperty, modifyLayerId){
+        let modifyLayerID = mongoose.Types.ObjectId(modifyLayerId)
         let tmp = {}
         tmp['$pull'] = deleteLayerProperty
         return await this.layerModel.findOneAndUpdate({
-            layerName: modifyLayerName
+            _id: modifyLayerID
         },tmp,{new: true})
     }
 
@@ -69,9 +90,10 @@ export class LayerService {
     }
 
     // 删除图层
-    async deleteLayer(layerName){
+    async deleteLayer(layerId){
+        let layerID = mongoose.Types.ObjectId(layerId)
         return await this.layerModel.deleteOne({
-            layerName: layerName
+            _id: layerID
         })
     }
 }
