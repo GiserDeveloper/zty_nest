@@ -4,6 +4,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Map } from './schema/map.schema';
 import { MapDto } from './dto/map.dto';
 
+let mongoose=require('mongoose');
+
 @Injectable()
 export class MapService {
     constructor(@InjectModel('Map') private mapModel: Model<Map>) {}
@@ -19,9 +21,12 @@ export class MapService {
 
     // 修改图层信息-字段
     async modifyMap(query, updateContent){
+        query = mongoose.Types.ObjectId(query)
+        updateContent.team_Id = mongoose.Types.ObjectId(updateContent.team_Id)
+        console.log(query, updateContent)
         return await this.mapModel.findOneAndUpdate(
             {
-                mapName: query
+                _id: query
             },
             {
                 $set: updateContent

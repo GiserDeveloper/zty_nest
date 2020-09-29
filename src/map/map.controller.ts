@@ -25,11 +25,11 @@ export class MapController {
     // 修改地图数据-部分字段
     @Put('modify')
     @ApiQuery({
-        name: 'mapName',
-        description: '请传入待修改地图名字'
+        name: 'mapId',
+        description: '请传入待修改地图id'
     })
     @ApiOperation({summary: '修改地图数据'})
-    modifyLayer(@Query('mapName') query, @Body() updateContent:MapDto){
+    modifyLayer(@Query('mapId') query, @Body() updateContent:MapDto){
         return this.mapService.modifyMap(query, updateContent);
     }
 }

@@ -11,6 +11,9 @@ import { LayerModule } from './layer/layer.module';
 import { MarkerModule } from './marker/marker.module';
 import { MapModule } from './map/map.module';
 import { CounterModule } from './counter/counter.module';
+import { TeamModule } from './team/team.module';
+import { TeamuserModule } from './teamuser/teamuser.module';
+import { SettingModule } from './setting/setting.module';
 
 @Module({
   imports: [MongooseModule.forRoot('mongodb://localhost:27017/zty',{
@@ -21,7 +24,7 @@ import { CounterModule } from './counter/counter.module';
     }), UserModule, RoleModule, AuthModule, 
     ConfigModule.forRoot({
       isGlobal: true
-    }), NoticeModule, LayerModule, MarkerModule, MapModule, CounterModule
+    }), NoticeModule, LayerModule, MarkerModule, MapModule, CounterModule, TeamModule, TeamuserModule, SettingModule
   ],
   controllers: [AppController],
   providers: [AppService],
