@@ -19,6 +19,10 @@ export class Map extends Document {
     @Prop()
     layerCount: number;
 
+    @Prop()
+    team_Id: string;
+
 }
 
 export const MapSchema = SchemaFactory.createForClass(Map);
+
