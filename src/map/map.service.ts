@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Map } from './schema/map.schema';
 import { MapDto } from './dto/map.dto';
+import { query } from 'express';
 
 let mongoose=require('mongoose');
 
@@ -35,6 +36,13 @@ export class MapService {
                 new: true
             }
         )
+    }
+
+    async getMapListByTeamId(teamId){
+        //根据teamId获取地图列表
+        return await this.mapModel.find({
+            team_id: mongoose.Types.ObjectId(teamId)
+        })
     }
 }
 

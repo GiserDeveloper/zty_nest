@@ -32,5 +32,15 @@ export class MapController {
     modifyLayer(@Query('mapId') query, @Body() updateContent:MapDto){
         return this.mapService.modifyMap(query, updateContent);
     }
+
+    @Get('getMapListByTeamId/:teamId')
+    @ApiParam({
+        name: 'teamId',
+        description: '请传入团队id'
+    })
+    @ApiOperation({summary: '获取团队中地图列表'})
+    getmMapListByTeamId(@Param('teamId') teamId){
+        return this.mapService.getMapListByTeamId(teamId)
+    }
 }
 

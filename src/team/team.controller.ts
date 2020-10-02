@@ -1,5 +1,5 @@
-import { Controller, Post, Body, Get, Param, Put, Delete, UsePipes, ValidationPipe, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Post, Body, Get, Param, Put, Delete, UsePipes, ValidationPipe, UseGuards, Query } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth, ApiQuery, ApiBody } from '@nestjs/swagger';
 import { TeamService } from './team.service';
 import { TeamDto } from './dto/team.dto';
 
@@ -24,5 +24,18 @@ export class TeamController {
     @ApiOperation({summary: '根据用户团队ID查找'})
     getRoleById(@Param('teamId') id){
         return this.teamService.getTeamById(id);
+    }
+
+    @Put('updateTeamName')
+    @ApiQuery({
+        name: 'teamId',
+        description: '请传入待修改团队id'
+    })
+    @ApiBody({
+
+    })
+    @ApiOperation({summary: '修改团队名称'})
+    modifyLayer(@Query('teamId') query, @Body() updateContent: TeamDto){
+        return this.teamService.updateTeamName(query, updateContent);
     }
 }
