@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { TeamuserSchema } from './schema/teamuser.schema';
 import { TeamuserDto } from './dto/teamuser.dto';
 
-import { Team } from '../team/schema/team.schema'
+import { Team } from '../team/schema/team.schema';
 import { Map } from 'src/map/schema/map.schema';
 
 let mongoose=require('mongoose');
@@ -55,7 +55,7 @@ export class TeamuserService {
             },
             {
                 // dafaultTeamId: mongoose.Types.ObjectId(newTeam._id)
-                '$addToSet': {
+                '$push': {
                     manageTeamList: [{
                         "teamId": mongoose.Types.ObjectId(newTeam._id),
                         "defaultMapId": mongoose.Types.ObjectId(newTeam._id),
@@ -116,7 +116,7 @@ export class TeamuserService {
     }
 
     async getManageTeamMapList(userId){
-        //根据用户ID获取管理团队列表
+        //根据用户ID获取管理团队以及地图列表
         return await this.teamuserModel.aggregate([
             {
                 $match: {_id : mongoose.Types.ObjectId(userId)}
@@ -126,6 +126,14 @@ export class TeamuserService {
             },
             {
                 $unwind: '$manageTeamList'
+            },
+            {
+                $lookup: {
+                    from: 'teams',
+                    localField: 'manageTeamList.teamId',
+                    foreignField: '_id',
+                    as: 'manageTeamList.teamInfo'
+                }
             },
             {
                 $lookup: {
@@ -139,7 +147,7 @@ export class TeamuserService {
     }
 
     async getJoinTeamMapList(userId){
-        //根据用户ID获取加入团队列表
+        //根据用户ID获取加入团队以及地图列表
         return await this.teamuserModel.aggregate([
             {
                 $match: {_id : mongoose.Types.ObjectId(userId)}
@@ -157,8 +165,90 @@ export class TeamuserService {
                     foreignField: '_id',
                     as: 'joinTeamList.teamInfo'
                 }
+            },
+            ,
+            {
+                $lookup: {
+                    from: 'maps',
+                    localField: 'joinTeamList.teamId',
+                    foreignField: 'team_id',
+                    as: 'joinTeamList.mapList'
+                }
             }
         ])
+    }
+
+    async getJoinTeamUsersList(teamId){
+        //根据teamId 返回团队用户列表
+        return await this.teamuserModel.find({"joinTeamList.teamId": mongoose.Types.ObjectId(teamId)})
+    }
+
+    async updateUsersTeamPower(userId, teamId, power){
+        //修改用户操作团队的权限
+        let userInfo = await this.teamuserModel.findById(mongoose.Types.ObjectId(userId))
+        for(var i = 0; i < userInfo.joinTeamList.length; i++){
+            console.log(userInfo.joinTeamList[i].teamId)
+            console.log(teamId)
+            if(userInfo.joinTeamList[i].teamId == teamId){
+                userInfo.joinTeamList[i].power = power
+                userInfo.markModified('power')
+                return await userInfo.save()
+            }
+        }
+        return '没有找到该用户加入的团队'
+    }
+
+    async updateDefaultTeam(userId, teamId){
+        // 修改用户默认团队ID
+        return await this.teamuserModel.findOneAndUpdate(
+            {
+                _id: mongoose.Types.ObjectId(userId)
+            },
+            {
+                '$set': {
+                    'defaultTeamId': mongoose.Types.ObjectId(teamId)
+                }
+            },
+            {
+                new: true
+            }
+        )
+    }
+
+    async updateTeamDefaultMap(userId, teamId, mapId){
+        //修改团队的默认地图ID
+        let mapinfo = await this.mapModel.findById(mongoose.Types.ObjectId(mapId))
+        if(mapinfo.team_Id != teamId){
+            return '团队中没有该地图'
+        }
+        let userInfo = await this.teamuserModel.findById(mongoose.Types.ObjectId(userId))
+        for(var i = 0; i < userInfo.manageTeamList.length; i++){
+            if(userInfo.manageTeamList[i].teamId == teamId){
+                userInfo.manageTeamList[i].defaultMapId = mongoose.Types.ObjectId(mapId)
+                userInfo.markModified('defaultMapId')
+                return await userInfo.save()
+            }
+        }
+        for(var i = 0; i < userInfo.joinTeamList.length; i++){
+            if(userInfo.joinTeamList[i].teamId == teamId){
+                userInfo.joinTeamList[i].defaultMapId = mongoose.Types.ObjectId(mapId)
+                userInfo.markModified('defaultMapId')
+                return await userInfo.save()
+            }
+        }
+        return '没有找到该用户加入的团队'
+
+    }
+
+    async removeUserFromTeam(userId, teamId){
+        let userInfo = await this.teamuserModel.findById(mongoose.Types.ObjectId(userId))
+        for(var i = 0; i < userInfo.joinTeamList.length; i++){
+            if(userInfo.joinTeamList[i].teamId == teamId){
+                userInfo.joinTeamList.splice(i,1)
+                userInfo.markModified('removeTeam')
+                return await userInfo.save()
+            }
+        }
     }
 }
 

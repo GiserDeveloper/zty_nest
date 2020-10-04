@@ -1,7 +1,7 @@
 import { Controller, Post, Body, Get, Param, Put, Delete, UsePipes, ValidationPipe, UseGuards, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { TeamuserService } from './teamuser.service';
-import { TeamuserDto } from './dto/teamuser.dto';
+import { TeamuserDto, TeamPowerDto, IDListDto } from './dto/teamuser.dto';
 import { get } from 'http';
 
 @Controller('teamuser')
@@ -81,6 +81,56 @@ export class TeamuserController {
     @ApiOperation({summary: '获取用户管理的团队以及地图列表'})
     getManageTeamMapList(@Param('userId') userId){
         return this.teamuserService.getManageTeamMapList(userId)
+    }
+
+    @Get('getJoinTeamUsersList/:teamId')
+    @ApiParam({
+        name: 'teamId',
+        description: '请传入teamId'
+    })
+    @ApiOperation({summary: '获取加入团队的用户列表'})
+    getJoinTeamUsersList(@Param('teamId') teamId){
+        return this.teamuserService.getJoinTeamUsersList(teamId)
+    }
+
+    @Put('updateUsersTeamPower/:userId')
+    @ApiParam({
+        name: 'userId',
+        description: '请传入userId'
+    })
+    @ApiOperation({summary: '修改用户对团队的操作权限'})
+    updateUsersTeamPower(@Param('userId') userId, @Body() updateContent:TeamPowerDto){
+        return this.teamuserService.updateUsersTeamPower(userId,updateContent.teamId,updateContent.power)
+    }
+
+    @Put('updateDefaultTeam')
+    @ApiQuery({
+        name: 'userId',
+    })
+    @ApiQuery({
+        name: 'teamId',
+    })
+    @ApiOperation({summary: '修改用户默认团队ID'})
+    updateDefaultTeam(@Query('userId') userId, @Query('teamId') teamId){
+        return this.teamuserService.updateDefaultTeam(userId,teamId)
+    }
+
+    @Put('updateTeamDefaultMap')
+    @ApiOperation({summary: '修改用户团队的默认地图ID'})
+    updateTeamDefaultMap(@Body() IDList: IDListDto){
+        return this.teamuserService.updateTeamDefaultMap(IDList.userId,IDList.teamId,IDList.mapId)
+    }
+
+    @Delete('removeUserFromTeam')
+    @ApiQuery({
+        name: 'userId',
+    })
+    @ApiQuery({
+        name: 'teamId',
+    })
+    @ApiOperation({summary: '把用户移除出团队'})
+    removeUserFromTeam(@Query('userId') userId, @Query('teamId') teamId){
+        return this.teamuserService.removeUserFromTeam(userId,teamId)
     }
 
 }

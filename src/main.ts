@@ -19,6 +19,8 @@ async function bootstrap() {
   //全局使用异常过滤器
   app.useGlobalFilters(new HttpExceptionFilter())
 
+  app.enableCors()
+
   //全局使用拦截器
   app.useGlobalInterceptors(new TransformInterceptor())
 

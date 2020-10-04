@@ -1,23 +1,34 @@
 import { Model } from 'mongoose';
-import { Injectable } from '@nestjs/common';
+import { Injectable, forwardRef, Inject } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Layer, LayerSchema } from './schema/layer.schema';
 import { LayerDto, modifyLayerFieldDto } from './dto/layer.dto';
 
 import { Marker } from '../marker/schema/marker.schema';
+// import { SettingSchema } from '../setting/schema/setting.schema'
+import { TeamuserSchema } from '../teamuser/schema/teamuser.schema'
+import { arrayContains } from 'class-validator';
+
+
+
 let mongoose=require('mongoose');
 
 @Injectable()
 export class LayerService {
     constructor(
         @InjectModel('Layer') private layerModel: Model<Layer>,
-        @InjectModel('Marker') private markerModel: Model<Marker>
+        @InjectModel('Marker') private markerModel: Model<Marker>,
+        // @InjectModel('SettingSchema') private settingModel,
+        @InjectModel('TeamUser') private teamuserModel
     ) {}
 
     async create(layerDto): Promise<Layer> {
         layerDto.map_id = mongoose.Types.ObjectId(layerDto.map_id)
         const createdLayer = new this.layerModel(layerDto);
         return await createdLayer.save();
+       
+        // await this.SettingService.insertUserSettingOfNewLayer(userIdList, res._id)
+        // return res
     }
 
     async findAllLayers(){
@@ -92,8 +103,28 @@ export class LayerService {
     // 删除图层
     async deleteLayer(layerId){
         let layerID = mongoose.Types.ObjectId(layerId)
+        // await this.SettingService.deleteManyByLayerId({'layerId': layerID})
         return await this.layerModel.deleteOne({
             _id: layerID
         })
+    }
+
+    async findLayersByMapId(mapId){
+        return await this.layerModel.aggregate(
+            [{
+                $match: {'map_id': mongoose.Types.ObjectId(mapId)}
+            },
+            {
+                $project: {'_id': 1}
+            }]
+        )
+    }
+
+    async findAllIdlist(){
+        return await this.layerModel.aggregate(
+            [{
+                $project: {_id: 1}
+            }]
+        )
     }
 }

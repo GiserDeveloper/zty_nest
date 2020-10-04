@@ -35,3 +35,37 @@ export class TeamuserDto{
 
 }
 
+export class TeamPowerDto{
+    @IsString()
+    @ApiProperty({
+        description: '团队ID'
+    })
+    teamId: string;
+
+    @IsNumber()
+    @ApiProperty({
+        description: '用户权限标识'
+    })
+    power: number;
+}
+
+export class IDListDto{
+    @IsString()
+    @ApiProperty({
+        description: '用户ID'
+    })
+    userId: string;
+
+    @IsString()
+    @ApiProperty({
+        description: '团队ID'
+    })
+    teamId: string;
+
+    @IsString()
+    @ApiProperty({
+        description: '地图ID'
+    })
+    mapId: string;
+}
+
