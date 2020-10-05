@@ -12,6 +12,7 @@ export class MapService {
     constructor(@InjectModel('Map') private mapModel: Model<Map>) {}
 
     async create(mapDto: MapDto): Promise<Map> {
+        mapDto.team_Id = mongoose.Types.ObjectId(mapDto.team_Id)
         const createdMap = new this.mapModel(mapDto);
         return await createdMap.save();
     }
@@ -40,8 +41,9 @@ export class MapService {
 
     async getMapListByTeamId(teamId){
         //根据teamId获取地图列表
+        console.log(teamId)
         return await this.mapModel.find({
-            team_id: mongoose.Types.ObjectId(teamId)
+            'team_Id': mongoose.Types.ObjectId(teamId)
         })
     }
 }

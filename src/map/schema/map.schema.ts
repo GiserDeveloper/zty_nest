@@ -6,6 +6,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
     strict: false
 })
 
+
 export class Map extends Document {
 
     @Prop({
@@ -19,8 +20,6 @@ export class Map extends Document {
     @Prop()
     layerCount: number;
 
-    @Prop()
-    team_Id: string;
 
 }
 

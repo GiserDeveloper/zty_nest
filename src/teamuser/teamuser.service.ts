@@ -14,7 +14,7 @@ export class TeamuserService {
     constructor(
         @InjectModel('Teamuser') private teamuserModel,
         @InjectModel('Team') private teamModel: Model<Team>,
-        @InjectModel('Map') private mapModel: Model<Map>
+        @InjectModel('Map') private mapModel
     ) {}
 
     async create(teamuserDto: TeamuserDto){
@@ -139,7 +139,7 @@ export class TeamuserService {
                 $lookup: {
                     from: 'maps',
                     localField: 'manageTeamList.teamId',
-                    foreignField: 'team_id',
+                    foreignField: 'team_Id',
                     as: 'manageTeamList.mapList'
                 }
             }
@@ -171,7 +171,7 @@ export class TeamuserService {
                 $lookup: {
                     from: 'maps',
                     localField: 'joinTeamList.teamId',
-                    foreignField: 'team_id',
+                    foreignField: 'team_Id',
                     as: 'joinTeamList.mapList'
                 }
             }

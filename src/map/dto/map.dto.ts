@@ -21,4 +21,10 @@ export class MapDto{
     })
     layerCount: number;
 
+    @IsString()
+    @ApiProperty({
+        description: '团队Id'
+    })
+    team_Id: string;
+
 }
