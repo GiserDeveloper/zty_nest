@@ -121,9 +121,18 @@ export class NoticeController {
             ]
         }
 
-        return this.noticeService.findNoticesByPages(queryInfo, page, limit)
-
+        let res = this.noticeService.findNoticesByPages(queryInfo, page, limit)
+        return res
 
     }
 
+    @Get('/:noticeId')
+    @ApiOperation({summary: '根据id查找notice'})
+    @ApiParam({
+        name: 'noticeId',
+        description: ''
+    })
+    getNoticeById(@Param('noticeId') noticeId ){
+        return this.noticeService.findNoticeById(noticeId)
+    }
 }

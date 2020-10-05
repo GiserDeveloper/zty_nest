@@ -1,7 +1,9 @@
-import { Controller, Post, Body, Get, Param, Put, Delete, UsePipes, ValidationPipe, UseGuards, Query } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Put, Delete, UsePipes, ValidationPipe, UseGuards, Query, Request, Response } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { MarkerService } from './marker.service';
 import { MarkerDto, modifyMarkerFieldDto } from './dto/marker.dto';
+const formidable = require("formidable");
+const path = require("path");
 
 
 @Controller('marker')
@@ -153,6 +155,17 @@ export class MarkerController {
     })
     testZty(@Param('mapId') mapId){
         return this.markerService.testZTY(mapId)
+    }
+
+    @Post('testUpload')
+    testUpload(@Request() req, @Response() res){
+        var form = new formidable.IncomingForm();
+        form.keepExtensions = true;
+        form.multiples = true;
+        form.uploadDir =path.join(__dirname,"my");
+        form.parse(req,function(err,fields,files){
+            console.log(files)
+        })
     }
 }
 
