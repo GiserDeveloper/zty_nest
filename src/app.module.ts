@@ -14,6 +14,9 @@ import { CounterModule } from './counter/counter.module';
 import { TeamModule } from './team/team.module';
 import { TeamuserModule } from './teamuser/teamuser.module';
 import { SettingModule } from './setting/setting.module';
+import { QichachaController } from './qichacha/qichacha.controller';
+import { QichachaService } from './qichacha/qichacha.service';
+import { QichachaModule } from './qichacha/qichacha.module';
 
 @Module({
   imports: [MongooseModule.forRoot('mongodb://localhost:27017/zty',{
@@ -24,7 +27,7 @@ import { SettingModule } from './setting/setting.module';
     }), UserModule, RoleModule, AuthModule, 
     ConfigModule.forRoot({
       isGlobal: true
-    }), NoticeModule, LayerModule, MarkerModule, MapModule, CounterModule, TeamModule, TeamuserModule, SettingModule
+    }), NoticeModule, LayerModule, MarkerModule, MapModule, CounterModule, TeamModule, TeamuserModule, SettingModule, QichachaModule
   ],
   controllers: [AppController],
   providers: [AppService],

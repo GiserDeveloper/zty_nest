@@ -32,6 +32,7 @@
     "class-transformer": "^0.3.1",
     "class-validator": "^0.12.2",
     "formidable": "^1.2.2",
+    "md5-node": "^1.0.1",
     "mongoose": "^5.10.0",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",

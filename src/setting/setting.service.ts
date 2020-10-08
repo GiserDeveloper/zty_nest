@@ -93,7 +93,7 @@ export class SettingService {
         for(let i = 0; i < userIdList.length; i++){
             let setting = this.settingModel({
                 layerId: mongoose.Types.ObjectId(layerId),
-                userId: mongoose.Types.ObjectId(userIdList[i]),
+                userId: mongoose.Types.ObjectId(userIdList[i]._id),
                 isVisible: true
             })
             settingList.push(setting)
