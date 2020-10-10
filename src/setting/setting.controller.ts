@@ -23,6 +23,18 @@ export class SettingController {
         return this.settingService.updateSetting(SettingDto.userId,SettingDto.layerId,SettingDto.isVisible)
     }
 
+    @Put('updateSettingMany')
+    @ApiOperation({summary: '批量修改用户配置'})
+    updateSettingMany(@Body() SettingDto: SettingDto[]){
+        for(var i = 0; i <SettingDto.length; i++){
+            let userId = SettingDto[i]['userId'];
+            let layerId = SettingDto[i]['layerId']
+            let isVisible = SettingDto[i]['isVisible']
+            this.settingService.updateSetting(userId,layerId,isVisible)
+        }
+        return this.settingService.getSettingById(SettingDto[0]['userId'])
+    }
+
     @Post('initSettings')
     @ApiOperation({summary: '重新初始化配置'})
     initSettings(){

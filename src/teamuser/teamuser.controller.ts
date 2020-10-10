@@ -133,4 +133,14 @@ export class TeamuserController {
         return this.teamuserService.removeUserFromTeam(userId,teamId)
     }
 
+    // 根据用户Id返回用户信息
+    @Get('getUserInfoById/:userId')
+    @ApiParam({
+        name: 'userId'
+    })
+    @ApiOperation({summary: '根据用户ID返回用户信息'})
+    getUserInfoById(@Param('userId') userId){
+        return this.teamuserService.getUserInfoById(userId)
+    }
+
 }

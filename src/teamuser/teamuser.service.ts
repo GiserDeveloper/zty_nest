@@ -217,6 +217,7 @@ export class TeamuserService {
 
     async updateTeamDefaultMap(userId, teamId, mapId){
         //修改团队的默认地图ID
+
         let mapinfo = await this.mapModel.findById(mongoose.Types.ObjectId(mapId))
         if(mapinfo.team_Id != teamId){
             return '团队中没有该地图'
@@ -249,6 +250,10 @@ export class TeamuserService {
                 return await userInfo.save()
             }
         }
+    }
+
+    async getUserInfoById(userId){
+        return await this.teamuserModel.findById(mongoose.Types.ObjectId(userId))
     }
 }
 

@@ -43,8 +43,9 @@ export class MarkerService {
     }
 
     // 查询给定图层name的点
-    async findMarkerByLayerName(layerName) {
-        return await this.markerModel.find({ layer_name: layerName });
+    async findMarkerByLayerName(layerId) {
+        let layerID = mongoose.Types.ObjectId(layerId)
+        return await this.markerModel.find({ layer_id: layerID });
     }
 
     // 查找所有的点

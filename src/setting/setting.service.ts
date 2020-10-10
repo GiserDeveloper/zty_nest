@@ -28,7 +28,7 @@ export class SettingService {
         return await this.settingModel.findOneAndUpdate(
             {
                 userId: mongoose.Types.ObjectId(userId),
-                mapId: mongoose.Types.ObjectId(layerId)
+                layerId: mongoose.Types.ObjectId(layerId)
             },
             {
                 '$set': {
