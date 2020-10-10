@@ -20,7 +20,6 @@ export class Map extends Document {
     @Prop()
     layerCount: number;
 
-
 }
 
 export const MapSchema = SchemaFactory.createForClass(Map);

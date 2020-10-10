@@ -25,7 +25,7 @@ export class QichachaController {
     let databaseres = await this.qichachaService.getInfoOk(query.name)
     if(!databaseres){
         let qichachares = await chaAPI(query.name)
-        return await this.qichachaService.insertData(qichachares)
+        return await this.qichachaService.insertData(qichachares.inputData, qichachares.originData)
     }
     return databaseres
     //判断是否存在数据库内

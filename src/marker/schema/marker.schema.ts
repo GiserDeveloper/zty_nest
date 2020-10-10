@@ -44,6 +44,12 @@ export class Marker extends Document {
 
     @Prop()
     markerField: object;
+
+    @Prop()
+    color: string;
+
+    @Prop()
+    fontSize: string;
 }
 
 export const MarkerSchema = SchemaFactory.createForClass(Marker);

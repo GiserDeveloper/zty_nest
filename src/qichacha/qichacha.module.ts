@@ -7,6 +7,7 @@ import { QiChaChaSchema } from './schema/qichacha.schema';
 @Module({
     imports: [
         MongooseModule.forFeature([{ name: 'QiChaCha', schema: QiChaChaSchema }]),
+        MongooseModule.forFeature([{ name: 'OriginInforData', schema: QiChaChaSchema}])
     ],
     providers: [QichachaService],
     controllers: [QichachaController]

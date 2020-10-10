@@ -10,14 +10,16 @@ let mongoose=require('mongoose');
 export class QichachaService {
     constructor(
         @InjectModel('QiChaCha') private qichachaModel,
+        @InjectModel('OriginInforData') private origininfordataModel
     ) {}
 
     async getInfoOk(queryname){
         return await this.qichachaModel.findOne({"name":queryname})
     }
 
-    async insertData(inputData){
-        var insertInfo = this.qichachaModel(inputData);
+    async insertData(inputData,originData){
+        var insertInfo = new this.qichachaModel(inputData);
+        await (new this.origininfordataModel(originData)).save()
         return await insertInfo.save()
     }
 }

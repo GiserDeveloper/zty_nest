@@ -55,7 +55,7 @@ export class NoticeController {
         return this.noticeService.updateHouXuanById(id, houxuanDto);
     }
 
-    @Put('biangeng:biangengId')
+    @Put('biangeng/:biangengId')
     @ApiParam({
         name: 'biangengId',
         description: '请传入变更公告Id'
