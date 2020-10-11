@@ -1,6 +1,8 @@
 import { Controller, Post, Body, Get, Param, Put, Delete, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { WeixinarticleService } from './weixinarticle.service'
+import { get } from 'mongoose';
+import { WeiXinArticleDto, OfficialAccountsDto}  from './dto/weixinarticle.dto'
 
 @Controller('weixinarticle')
 @ApiTags('微信文章模块')
@@ -11,7 +13,7 @@ export class WeixinarticleController {
 
     @Post('weixinarticle/create')
     @ApiOperation({summary: '创建微信文章'})
-    createZhaoBiao(@Body() weixinarticle){
+    createZhaoBiao(@Body() weixinarticle:WeiXinArticleDto){
         return this.weixinarticleService.create(weixinarticle);
     }
 
@@ -23,6 +25,12 @@ export class WeixinarticleController {
     @ApiOperation({summary: '传入招标公告Id修改内容'})
     updateZhaoBiaoById(@Param('id') id, @Body() weixinarticle){
         return this.weixinarticleService.updateweixinarticleById(id, weixinarticle);
+    }
+
+    @Get('initDataBase')
+    @ApiOperation({summary: '将json数据导入数据库'})
+    initDataBase(){
+        return this.weixinarticleService.initDataBase()
     }
 
     @Post('queryPageInfo')
@@ -47,4 +55,26 @@ export class WeixinarticleController {
 
     }
 
+    @Post('newofficialaccounts')
+    @ApiOperation({summary: '加入爬取公众号'})
+    async NewOfficialAccounts(@Body() name:OfficialAccountsDto){
+        console.log(name)
+        return await this.weixinarticleService.newofficialaccounts(name)
+    }
+
+    @Get('getofficialaccountsList')
+    @ApiOperation({summary: '获取公众号名称列表'})
+    async GetOfficialAccountsList(){
+        return await this.weixinarticleService.getofficialaccountsList()
+    }
+
+    @Delete('deleteofficialaccounts/:id')
+    @ApiQuery({
+        name: 'id',
+        description: '公众号ID'
+    })
+    @ApiOperation({summary: '根据Id移除微信公众号'})
+    async DeleteOfficialAccounts(@Query('id') id){
+        return await this.weixinarticleService.deleteofficialaccounts(id)
+    }
 }

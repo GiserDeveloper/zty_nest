@@ -2,16 +2,37 @@ import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { WeiXinArticle } from './schema/weixinarticle.schema'
+var fs = require ('fs')
+
+let mongoose=require('mongoose');
 
 @Injectable()
 export class WeixinarticleService {
     constructor(
-        @InjectModel('weixinarticle') private weixinarticleModel
+        @InjectModel('weixinarticle') private weixinarticleModel,
+        @InjectModel('officialaccounts') private officialaccountsModel
     ) { }
 
     async create(weixinArticle){
         const createdweixinArticle = new this.weixinarticleModel(weixinArticle)
         return await createdweixinArticle.save()
+    }
+
+    async newofficialaccounts(name){
+        //加入新公众号
+        console.log(name)
+        const createofficialaccounts = new this.officialaccountsModel(name)
+        return await createofficialaccounts.save()
+    }
+
+    async deleteofficialaccounts(id){
+        //通过id删除公众号
+        return await this.officialaccountsModel.deleteOne({_id: mongoose.Types.ObjectId(id)})
+    }
+
+    async getofficialaccountsList(){
+        //获取公众号列表
+        return await this.officialaccountsModel.find()
     }
 
     async updateweixinarticleById(id, weixinArticle) {
@@ -36,5 +57,20 @@ export class WeixinarticleService {
         res['totalPageNum'] = pages
         res['totalNum'] = count
         return res
+    }
+
+    async initDataBase(){
+        let url = 'D:/zty_nest/src/weixinarticle/基建通.json'
+        var self = this
+        let f = fs.readFile(url, "utf-8", function(err, data){
+            // console.log(data);
+            let j = JSON.parse(data);
+            j.forEach(element => {
+                element.type = '基建通'
+                let data = new self.weixinarticleModel(element);
+                data.save()
+            },this);
+            // console.log(j);
+        })
     }
 }
