@@ -38,16 +38,31 @@ export class WeixinarticleController {
     getNoticeInfoByPage(@Body() queryBody){
         // let provice = (queryBody.proviceName == "" || !('proviceName' in queryBody) ? {} : {省份:queryBody.proviceName})
         let type = (queryBody.typeName == "" || !('typeName' in queryBody)? {} : {type:queryBody.typeName})
-
         let page = ('page' in queryBody)? queryBody.page : 1
         let limit = ('limit' in queryBody)? queryBody.limit : 0
-
-        let queryInfo = {
-            '$or': [
-                { '$and': [
-                    type
-                ]}
-            ]
+        var queryInfo = {}
+        if(!('title' in queryBody) || queryBody.title == ''){
+            queryInfo = {
+                '$or': [
+                    { '$and': [
+                        type
+                    ]}
+                ]
+            }
+        }
+        else{
+            let title = queryBody.title
+            const reg = new RegExp(title, 'i')
+            queryInfo = {
+                '$or': [
+                    { '$and': [
+                        {
+                            'title': {$regex: reg}
+                        },
+                        type
+                    ]}
+                ]
+            }
         }
 
         let res = this.weixinarticleService.findNoticesByPages(queryInfo, page, limit)

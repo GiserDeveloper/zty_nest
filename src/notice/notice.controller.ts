@@ -108,18 +108,42 @@ export class NoticeController {
     getNoticeInfoByPage(@Body() queryBody: NoticeQueryPageDto){
         let provice = (queryBody.proviceName == "" || !('proviceName' in queryBody) ? {} : {省份:queryBody.proviceName})
         let type = (queryBody.typeName == "" || !('typeName' in queryBody)? {} : {类型:queryBody.typeName})
-
         let page = ('page' in queryBody)? queryBody.page : 1
         let limit = ('limit' in queryBody)? queryBody.limit : 0
-
-        let queryInfo = {
-            '$or': [
-                { '$and': [
-                    provice,
-                    type
-                ]}
-            ]
+        let queryInfo = {}
+        if(!('title' in queryBody) || queryBody.title == ''){
+            queryInfo = {
+                '$or': [
+                    { '$and': [
+                        provice,
+                        type
+                    ]}
+                ]
+            }
         }
+        else{
+            let title = queryBody.title
+            const reg = new RegExp(title, 'i')
+            queryInfo = {
+                '$or': [
+                    { '$and': [
+                        {
+                            '公告标题': {$regex: reg}
+                        },
+                        provice,
+                        type
+                    ]}
+                ]
+            }
+        }
+        // let queryInfo = {
+        //     '$or': [
+        //         { '$and': [
+        //             provice,
+        //             type
+        //         ]}
+        //     ]
+        // }
 
         let res = this.noticeService.findNoticesByPages(queryInfo, page, limit)
         return res

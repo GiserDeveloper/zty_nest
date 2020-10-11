@@ -252,6 +252,13 @@ export class NoticeQueryPageDto{
     })
     typeName: string;
 
+    
+    @IsString()
+    @ApiProperty({
+        required: false
+    })
+    title: string;
+
     @IsNumber()
     @ApiProperty({
         required: false
