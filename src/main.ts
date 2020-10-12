@@ -5,7 +5,9 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { logger } from './common/middleware/logger.middleware';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { TransformInterceptor } from './common/interceptor/transform.interceptor';
-
+import * as serveStatic from 'serve-static';
+import { join } from 'path';
+const path = require("path");
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -20,6 +22,11 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter())
 
   app.enableCors()
+
+  // 静态资源配置
+  app.use('/public',serveStatic(path.join(__dirname,'../public'),{
+    extensions: ['jpg', 'jpeg', 'png', 'gif']
+  }))
 
   //全局使用拦截器
   app.useGlobalInterceptors(new TransformInterceptor())

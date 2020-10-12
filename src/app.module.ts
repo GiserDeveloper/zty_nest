@@ -19,6 +19,8 @@ import { QichachaService } from './qichacha/qichacha.service';
 import { QichachaModule } from './qichacha/qichacha.module';
 import { WeixinarticleModule } from './weixinarticle/weixinarticle.module';
 import { BaiduModule } from './baidu/baidu.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 
 

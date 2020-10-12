@@ -2,9 +2,26 @@ import { Controller, Post, Body, Get, Param, Put, Delete, UsePipes, ValidationPi
 import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { MarkerService } from './marker.service';
 import { MarkerDto, modifyMarkerFieldDto } from './dto/marker.dto';
+import { fstat } from 'fs';
 const formidable = require("formidable");
 const path = require("path");
+var fs= require('fs') 
 
+function delDir(path){
+    let files = [];
+    if(fs.existsSync(path)){
+        files = fs.readdirSync(path);
+        files.forEach((file, index) => {
+            let curPath = path + "/" + file;
+            if(fs.statSync(curPath).isDirectory()){
+                delDir(curPath); //递归删除文件夹
+            } else {
+                fs.unlinkSync(curPath); //删除文件
+            }
+        });
+        fs.rmdirSync(path);
+    }
+}
 
 @Controller('marker')
 @ApiTags('标记点模块')
@@ -158,14 +175,50 @@ export class MarkerController {
     }
 
     @Post('testUpload')
-    testUpload(@Request() req, @Response() res){
+    async testUpload(@Request() req, @Response() res, @Query('markerId') markerId){
         var form = new formidable.IncomingForm();
         form.keepExtensions = true;
         form.multiples = true;
-        form.uploadDir =path.join(__dirname,"my");
-        form.parse(req,function(err,fields,files){
-            console.log(files)
+        var upLoadPath = path.join(__dirname,'../../public/'+ markerId);
+        fs.mkdir(upLoadPath,(err)=>{})
+        form.uploadDir = upLoadPath
+        let tmp = await new Promise((resolve, reject)=>{
+            form.parse(req, (err, fields, files)=>{
+                resolve(fields)
+                //form.uploadDir =path.join(__dirname,"my/" + files['markerId']);
+            })
         })
+        console.log(tmp)
+    }
+
+    @Post('testUpload2')
+    async testUpload2(@Request() req, @Response() res, @Query('markerId') markerId){
+        var form = new formidable.IncomingForm();
+        form.keepExtensions = true;
+        form.multiples = true;
+        var upLoadPath = path.join(__dirname,'../../public/'+ markerId);
+        delDir(upLoadPath)
+        fs.mkdir(upLoadPath,(err)=>{})
+        form.uploadDir = upLoadPath
+        let tmp = await new Promise((resolve, reject)=>{
+            form.parse(req, (err, fields, files)=>{
+                resolve(fields)
+                //form.uploadDir =path.join(__dirname,"my/" + files['markerId']);
+            })
+        })
+        console.log(tmp)
+    }
+
+    @Get('testDownLoad')
+    async testDownLoad(@Query('markerId') markerId){
+        let downLoadPath = path.join(__dirname, '../../public/' + markerId);
+        let imgUrls = fs.readdirSync(downLoadPath);
+        let imgUrlsRes = []
+        for(let imgUrl of imgUrls){
+            let tmp = 'http://192.168.203.221:3000/public' + '/' + markerId + '/' + imgUrl
+            imgUrlsRes.push(tmp)
+        }
+        return imgUrlsRes
     }
 }
 

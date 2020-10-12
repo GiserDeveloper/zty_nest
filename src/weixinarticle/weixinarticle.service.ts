@@ -60,7 +60,7 @@ export class WeixinarticleService {
     }
 
     async initDataBase(){
-        let url = 'D:/zty_nest/src/weixinarticle/基建通.json'
+        let url = 'D:/imooc/NestJS/zty-project/src/weixinarticle/基建通.json'
         var self = this
         let f = fs.readFile(url, "utf-8", function(err, data){
             // console.log(data);

@@ -234,5 +234,6 @@ export class MarkerService {
         ])
     }
 
-    // 测试文件上传
+    // 根据点ID返回点所带的图片
+
 }
