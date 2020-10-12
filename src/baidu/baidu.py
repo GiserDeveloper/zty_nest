@@ -10,7 +10,7 @@ import json
 options = webdriver.ChromeOptions()
 options.add_argument('-headless')
 driver = webdriver.Chrome()
-driver.implicitly_wait(15)
+driver.implicitly_wait(5)
 
 # 指定搜索关键词与限定网站
 keywords = sys.argv[1]#'sax'
@@ -37,29 +37,24 @@ except:
 
 
 # 保存标题及url
-title_list = driver.find_elements_by_xpath("//div[@class='result c-container new-pmd']/h3/a")
-# title_lst = []
-# for i in title_list:
-#     # print(i, type(i))
-#     # 保存节点所有源代码
-#     title = etree.tostring(i, pretty_print=True, method='html',).decode("utf-8").encode('utf-8').decode('unicode_escape')
-#     title_lst.append(title)
-
-# 保存简介
-detail_list = driver.find_elements_by_xpath("//div[@class='c-abstract']")
 list = []
-i = 0 
-for detail in detail_list:
-    # print(i, type(i))
-    # 保存节点所有源代码
-    item = {}
-    item["title"] = (title_list[i].text)
-    item["link"] = (title_list[i].get_attribute('href'))
-    item["detail"] = (detail.text)
-    i = i + 1
-    list.append(item)
-    # detail = etree.tostring(i, pretty_print=True, method='html',).decode("utf-8").encode('utf-8').decode('unicode_escape')
-    # detail_lst.append(detail)
+try:
+    title_list = driver.find_elements_by_xpath("//div[@class='result c-container new-pmd']/h3/a")
+    detail_list = driver.find_elements_by_xpath("//div[@class='c-abstract']")
+    i = 0 
+    for detail in detail_list:
+        # print(i, type(i))
+        # 保存节点所有源代码
+        item = {}
+        item["title"] = (title_list[i].text)
+        item["link"] = (title_list[i].get_attribute('href'))
+        item["detail"] = (detail.text)
+        i = i + 1
+        list.append(item)
+        # detail = etree.tostring(i, pretty_print=True, method='html',).decode("utf-8").encode('utf-8').decode('unicode_escape')
+        # detail_lst.append(detail)
+except:
+    list = []
 
 # 生成二维列表
 # list = list(zip(title_lst, detail_lst))

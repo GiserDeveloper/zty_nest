@@ -24,7 +24,9 @@ export class MapService {
     // 修改图层信息-字段
     async modifyMap(query, updateContent){
         query = mongoose.Types.ObjectId(query)
-        updateContent.team_Id = mongoose.Types.ObjectId(updateContent.team_Id)
+        if(updateContent.team_Id){
+            updateContent.team_Id = mongoose.Types.ObjectId(updateContent.team_Id)
+        }
         console.log(query, updateContent)
         return await this.mapModel.findOneAndUpdate(
             {
