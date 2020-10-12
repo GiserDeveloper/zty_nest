@@ -18,6 +18,7 @@ import { QichachaController } from './qichacha/qichacha.controller';
 import { QichachaService } from './qichacha/qichacha.service';
 import { QichachaModule } from './qichacha/qichacha.module';
 import { WeixinarticleModule } from './weixinarticle/weixinarticle.module';
+import { BaiduModule } from './baidu/baidu.module';
 
 
 
@@ -30,7 +31,7 @@ import { WeixinarticleModule } from './weixinarticle/weixinarticle.module';
     }), UserModule, RoleModule, AuthModule, 
     ConfigModule.forRoot({
       isGlobal: true
-    }), NoticeModule, LayerModule, MarkerModule, MapModule, CounterModule, TeamModule, TeamuserModule, SettingModule, QichachaModule, WeixinarticleModule
+    }), NoticeModule, LayerModule, MarkerModule, MapModule, CounterModule, TeamModule, TeamuserModule, SettingModule, QichachaModule, WeixinarticleModule, BaiduModule
   ],
   controllers: [AppController],
   providers: [AppService],
