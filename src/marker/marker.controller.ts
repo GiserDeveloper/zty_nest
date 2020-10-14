@@ -183,15 +183,26 @@ export class MarkerController {
         form.keepExtensions = true;
         form.multiples = true;
         var upLoadPath = path.join(__dirname,'../../public/'+ markerId);
-        fs.mkdir(upLoadPath,(err)=>{})
+        // fs.mkdir(upLoadPath,(err)=>{})
+        await fs.exists(upLoadPath, function(exists){
+            if(!exists){
+                fs.mkdir(upLoadPath,(err)=>{})
+            }
+        })
         form.uploadDir = upLoadPath
         let tmp = await new Promise((resolve, reject)=>{
             form.parse(req, (err, fields, files)=>{
-                resolve(fields)
+                if(err){
+                    reject(err)
+                }
+                else{
+                    resolve(fields)
+                }    
                 //form.uploadDir =path.join(__dirname,"my/" + files['markerId']);
             })
         })
-        console.log(tmp)
+        // console.log('ok')
+        res.send(tmp)
     }
 
     @Post('testUpload2')
@@ -204,10 +215,17 @@ export class MarkerController {
         form.uploadDir = upLoadPath
         let tmp = await new Promise((resolve, reject)=>{
             form.parse(req, (err, fields, files)=>{
-                resolve(fields)
+                if(err){
+                    reject(err)
+                }
+                else{
+                    resolve(fields)
+                }    
                 //form.uploadDir =path.join(__dirname,"my/" + files['markerId']);
             })
         })
+        // console.log('ok')
+        res.send(tmp)
     }
 
     @Get('deleteImg')
@@ -215,8 +233,9 @@ export class MarkerController {
         if(imgUrl.indexOf(':3000')!=-1){
             // 删除服务器的图片
             let filePath = path.join(__dirname, '../../public/' + markerId) +'/' + imgUrl.split(markerId + '/')[1]
-            fs.unlinkSync(filePath); //删除文件
+            return fs.unlinkSync(filePath); //删除文件
         }
+        return '图片不存在'
     }
 
     @Get('testDownLoad')
