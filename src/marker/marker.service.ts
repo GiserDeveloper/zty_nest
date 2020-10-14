@@ -3,6 +3,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Marker, MarkerSchema } from './schema/marker.schema';
 import { MarkerDto, modifyMarkerFieldDto } from './dto/marker.dto';
+import { utils, read, writeFile } from 'xlsx'
+
 
 import { Counter } from 'src/counter/schema/counter.schema';
 import { Layer } from 'src/layer/schema/layer.schema';
@@ -235,5 +237,151 @@ export class MarkerService {
     }
 
     // 根据点ID返回点所带的图片
+
+    //Excel格式化导出数据（yzy）
+    async getData(layerId) {
+        let layerID = mongoose.Types.ObjectId(layerId)
+        let resultData = []
+
+        await this.markerModel.find({layer_id:layerID}, (err, data) => { //根据layerId筛选数据
+            if(err) throw(err)
+            if(data.length == 0) return resultData;  //若无记录则跳出
+
+            for (let i in data){ //第一层循环，取出数组中每一条记录
+                let data_object = data[i].toObject()
+                let temp_result = {} //整理格式后的记录
+
+                delete data_object['_id']    //删除不要的两个字段
+                delete data_object['layer_id']
+                                
+                //直接写死，不用循环
+                temp_result['标记名称'] = data_object.markerName
+                temp_result['经度'] = data_object.latitude
+                temp_result['纬度'] = data_object.longitude
+                for(let key in data_object.markerField){   //展开markerFild
+                    temp_result[key] = data_object['markerField'][key]
+                }
+                            
+                resultData.push(temp_result)
+            }
+        })
+        return resultData
+    }
+    //导出函数
+    async excelExport(layerId, path){
+        let json =await this.getData(layerId)
+
+        if(json.length == 0){
+            return '该图层无记录可导出!'
+        }
+
+        let ss = utils.json_to_sheet(json) //通过工具将json转表对象
+        let ref = ss['!ref'] //获取表的范围
+        let workbook = { //定义操作文档
+            SheetNames:['nodejs-sheetname'], //定义表明
+            Sheets:{
+                'nodejs-sheetname':Object.assign({},ss,{'!ref':ref}) //表对象[注意表名]
+            },
+        }
+
+        let fileName = layerId + '.xlsx'
+        if(path == null){
+            writeFile(workbook, "D:/" + fileName)
+            return "文件保存位置：D:/" + fileName
+        }
+        else{
+            writeFile(workbook, path + fileName); //将数据写入文件
+            return "文件保存位置：" + path + fileName
+        }
+
+    }
+    //Excel格式化导入数据（yzy）
+
+        IsExisting(record) {
+        return new Promise((resolve,reject) => {
+            this.markerModel.findOne({'markerName':record.markerName}, (err, result) => {
+                if(err) reject(err);
+    
+                if(!result){
+                    resolve(false);   //若无记录则返回false
+                }
+                else{
+                    resolve(true);  //若有记录则返回false
+                }
+            })
+        })
+    }
+
+    async excelImport(file, layerId){
+        let workbook = read(file, {type:"buffer"})
+        let sheetNames = workbook.SheetNames; //获取表名
+        let sheet = workbook.Sheets[sheetNames[0]]; //通过表名得到表对象
+        let data =utils.sheet_to_json(sheet); //通过工具将表对象的数据读出来并转成json
+
+        if( !data[0] || !data[0]['标记名称'] ){
+            return '请输入正确的xlsx文件！'
+        }
+
+        var insertCount = 0; //新增记录计数器
+        var sum = 0;   //总数计数器
+        var updataCount = 0; //更新计数器
+
+        //处理输入文件的格式
+        for(let i in data){
+            let data_object = {}
+            data_object = data[i]
+            let temp_result = {}
+            temp_result['markerField'] = {}
+
+            //获取文件的信息
+            for(let key in data_object){
+                if(key == '标记名称'){
+                    temp_result['markerName'] = data_object[key]
+                }
+                else if(key == '经度'){
+                    temp_result['latitude'] = data_object[key]
+                }
+                else if(key == '纬度'){
+                    temp_result['longitude'] = data_object[key]
+                }
+                else if(key.indexOf('图片') * key.indexOf('添加人员') * key.indexOf('添加时间') * key.indexOf('样式') != 1){
+                    // delete data_object[key]
+                    continue
+                }
+                else{
+                    temp_result['markerField'][key] = data_object[key]
+                }
+            }
+            temp_result['width'] = 30
+            temp_result['height'] = 30
+            temp_result['iconPath'] = '././'//这里要修改
+            temp_result['layer_id'] = mongoose.Types.ObjectId(layerId)
+            temp_result['callout'] = {
+                content: temp_result['markerName'],
+                display: 'BYCLICK'
+            }
+
+            //console.log('temp_result', temp_result)
+
+        if(await this.IsExisting(temp_result)){ //更新记录，但是不改变id
+            this.markerModel.updateOne(
+                {markerName:temp_result['markerName']},
+                {$set:temp_result},
+                (err,doc) => {
+                    if(err) throw err
+                    console.log(doc)
+                }
+            )
+            updataCount++
+        }
+        else{
+            this.create(temp_result)
+            insertCount++
+            } 
+        }
+        sum = insertCount + updataCount
+        //
+        return '共处理记录'+sum+'条\r\n'+'更新记录'+ updataCount +'条\r\n'+'新增记录'+ insertCount +'条\r\n'
+    }
 
 }

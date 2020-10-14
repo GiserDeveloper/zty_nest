@@ -1,11 +1,14 @@
-import { Controller, Post, Body, Get, Param, Put, Delete, UsePipes, ValidationPipe, UseGuards, Query, Request, Response } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Put, Delete, UsePipes, ValidationPipe, UseGuards, Query, Request, Response, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import {FileInterceptor} from '@nestjs/platform-express'
 import { MarkerService } from './marker.service';
 import { MarkerDto, modifyMarkerFieldDto } from './dto/marker.dto';
 import { fstat } from 'fs';
+// import 'utils';
 const formidable = require("formidable");
 const path = require("path");
-var fs= require('fs') 
+var fs= require('fs')
+
 
 function delDir(path){
     let files = [];
@@ -222,10 +225,40 @@ export class MarkerController {
         let imgUrls = fs.readdirSync(downLoadPath);
         let imgUrlsRes = []
         for(let imgUrl of imgUrls){
-            let tmp = 'http://192.168.203.221:3000/public' + '/' + markerId + '/' + imgUrl
+            let tmp = 'http://localhost:3000/public' + '/' + markerId + '/' + imgUrl
             imgUrlsRes.push(tmp)
         }
         return imgUrlsRes
+    }
+
+    //下载数据
+    @Get('download/:layer_id/:path')
+    @ApiParam({
+        name:'layer_id',
+        description:'请输入图层编号'
+    })
+    @ApiParam({
+        name:'path',
+        description:'请输入保存路径'
+    })
+    @ApiOperation({summary:'导出图层所有记录至excel表格'})
+    donwloadfile(@Param() param){
+        console.log('文件导出功能执行成功!' )
+        return this.markerService.excelExport(param.layer_id, null)
+        // return this.markerService.excelExport(param.layer_id, null)
+    }
+
+    //上传数据
+    @Post('upload/:layer_id')
+    @ApiParam({
+        name:'layer_id',
+        description:'请输入图层编号'
+    })
+    @ApiOperation({summary:'导入excel记录'})
+    @UseInterceptors(FileInterceptor('file'))
+    uploadFile(@UploadedFile() file, @Param() param){
+      console.log('文件导入功能执行成功!')
+      return this.markerService.excelImport(file.buffer, param.layer_id)
     }
 }
 
