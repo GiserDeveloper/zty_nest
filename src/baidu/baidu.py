@@ -7,10 +7,13 @@ import pandas as pd
 import json
 
 
-options = webdriver.ChromeOptions()
-options.add_argument('-headless')
-driver = webdriver.Chrome()
-driver.implicitly_wait(5)
+# options = webdriver.ChromeOptions()
+# options.add_argument('-headless')
+# driver = webdriver.Chrome()
+# driver.implicitly_wait(15)
+
+driver = webdriver.Chrome(executable_path="D:\imooc\spider_final\WebSpider\WebSpider\chromedriver.exe")
+driver.implicitly_wait(15)
 
 # 指定搜索关键词与限定网站
 keywords = sys.argv[1]#'sax'

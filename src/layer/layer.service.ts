@@ -25,6 +25,7 @@ export class LayerService {
     async create(layerDto): Promise<Layer> {
         layerDto.map_id = mongoose.Types.ObjectId(layerDto.map_id)
         const createdLayer = new this.layerModel(layerDto);
+        console.log(layerDto)
         return await createdLayer.save();
        
         // await this.SettingService.insertUserSettingOfNewLayer(userIdList, res._id)

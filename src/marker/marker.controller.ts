@@ -192,13 +192,12 @@ export class MarkerController {
     }
 
     @Post('testUpload2')
-    async testUpload2(@Request() req, @Response() res, @Query('markerId') markerId){
+    async testUpload2(@Request() req, @Response() res, @Query('markerId') markerId, @Query('imgUrl') imgUrl){
         var form = new formidable.IncomingForm();
         form.keepExtensions = true;
         form.multiples = true;
         var upLoadPath = path.join(__dirname,'../../public/'+ markerId);
-        delDir(upLoadPath)
-        fs.mkdir(upLoadPath,(err)=>{})
+        //fs.mkdir(upLoadPath,(err)=>{})
         form.uploadDir = upLoadPath
         let tmp = await new Promise((resolve, reject)=>{
             form.parse(req, (err, fields, files)=>{
@@ -206,7 +205,15 @@ export class MarkerController {
                 //form.uploadDir =path.join(__dirname,"my/" + files['markerId']);
             })
         })
-        console.log(tmp)
+    }
+
+    @Get('deleteImg')
+    async deleteImg(@Query('markerId') markerId, @Query('imgUrl') imgUrl){
+        if(imgUrl.indexOf(':3000')!=-1){
+            // 删除服务器的图片
+            let filePath = path.join(__dirname, '../../public/' + markerId) +'/' + imgUrl.split(markerId + '/')[1]
+            fs.unlinkSync(filePath); //删除文件
+        }
     }
 
     @Get('testDownLoad')
