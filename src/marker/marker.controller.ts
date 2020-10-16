@@ -250,34 +250,33 @@ export class MarkerController {
         return imgUrlsRes
     }
 
-    //下载数据
-    @Get('download/:layer_id/:path')
-    @ApiParam({
-        name:'layer_id',
-        description:'请输入图层编号'
-    })
-    @ApiParam({
-        name:'path',
-        description:'请输入保存路径'
-    })
-    @ApiOperation({summary:'导出图层所有记录至excel表格'})
-    donwloadfile(@Param() param){
-        console.log('文件导出功能执行成功!' )
-        return this.markerService.excelExport(param.layer_id, null)
-        // return this.markerService.excelExport(param.layer_id, null)
-    }
-
-    //上传数据
-    @Post('upload/:layer_id')
-    @ApiParam({
-        name:'layer_id',
-        description:'请输入图层编号'
-    })
-    @ApiOperation({summary:'导入excel记录'})
-    @UseInterceptors(FileInterceptor('file'))
-    uploadFile(@UploadedFile() file, @Param() param){
-      console.log('文件导入功能执行成功!')
-      return this.markerService.excelImport(file.buffer, param.layer_id)
-    }
+      //下载数据
+      @Get('download/:layer_id')
+      @ApiParam({
+          name:'layer_id',
+          description:'请输入图层编号'
+      })
+      @ApiOperation({summary:'导出图层所有记录至excel表格'})
+      async donwloadfile(@Param() param, @Response() res){
+          console.log('文件导出功能执行成功!')
+          let data = await this.markerService.excelExport(param.layer_id)
+          res.setHeader('Content-Type', 'application/vnd.ms-excel')
+        //   res.setHeader('responseType','blob')
+          res.send(data)
+      }
+  
+      //上传数据
+      @Post('upload/:layer_id')
+      @ApiParam({
+          name:'layer_id',
+          description:'请输入图层编号'
+      })
+      @ApiOperation({summary:'导入excel记录'})
+      @UseInterceptors(FileInterceptor('file'))
+      
+      uploadFile(@UploadedFile() file, @Param() param){
+        console.log('文件导入功能执行成功!')
+        return this.markerService.excelImport(file.buffer, param.layer_id)
+      }
 }
 

@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Marker, MarkerSchema } from './schema/marker.schema';
 import { MarkerDto, modifyMarkerFieldDto } from './dto/marker.dto';
-import { utils, read, writeFile } from 'xlsx'
+import { utils, read, writeFile, write } from 'xlsx'
 
 
 import { Counter } from 'src/counter/schema/counter.schema';
@@ -237,8 +237,8 @@ export class MarkerService {
     }
 
     // 根据点ID返回点所带的图片
-
     //Excel格式化导出数据（yzy）
+    ////获取数据
     async getData(layerId) {
         let layerID = mongoose.Types.ObjectId(layerId)
         let resultData = []
@@ -267,8 +267,9 @@ export class MarkerService {
         })
         return resultData
     }
-    //导出函数
-    async excelExport(layerId, path){
+
+    ////导出函数
+    async excelExport(layerId){
         let json =await this.getData(layerId)
 
         if(json.length == 0){
@@ -284,20 +285,20 @@ export class MarkerService {
             },
         }
 
-        let fileName = layerId + '.xlsx'
-        if(path == null){
-            writeFile(workbook, "D:/" + fileName)
-            return "文件保存位置：D:/" + fileName
-        }
-        else{
-            writeFile(workbook, path + fileName); //将数据写入文件
-            return "文件保存位置：" + path + fileName
-        }
+        const excelFIle = write(workbook,{
+            bookType: 'xlsx', // 输出的文件类型
+            type: 'buffer', // 输出的数据类型
+            compression:true // 关闭zip压缩
+        })
+        console.log(excelFIle)
+
+        return excelFIle
 
     }
     //Excel格式化导入数据（yzy）
 
-        IsExisting(record) {
+    ////判断记录是否存在数据库中
+     IsExisting(record) {
         return new Promise((resolve,reject) => {
             this.markerModel.findOne({'markerName':record.markerName}, (err, result) => {
                 if(err) reject(err);
@@ -312,6 +313,17 @@ export class MarkerService {
         })
     }
 
+    ////根据layer_id获取layer图层的field格式
+    async getLayerForm(layerId){
+        return new Promise((resolve, reject) => {
+            this.layerModel.findOne({_id:layerId}, (err, doc) => {
+                if(err) reject(err)
+                resolve(doc.fieldList)
+            })
+        })
+    }
+
+    ////导入函数
     async excelImport(file, layerId){
         let workbook = read(file, {type:"buffer"})
         let sheetNames = workbook.SheetNames; //获取表名
@@ -325,6 +337,10 @@ export class MarkerService {
         var insertCount = 0; //新增记录计数器
         var sum = 0;   //总数计数器
         var updataCount = 0; //更新计数器
+        let color = ['红色.png','蓝色.png','绿色.png','粉色.png','白色.png','黑色.png','橙色.png','黄色.png'] //icon颜色数组
+
+        let layerForm = {} //图层filed格式
+        layerForm = await this.getLayerForm(mongoose.Types.ObjectId(layerId))
 
         //处理输入文件的格式
         for(let i in data){
@@ -345,23 +361,39 @@ export class MarkerService {
                     temp_result['longitude'] = data_object[key]
                 }
                 else if(key.indexOf('图片') * key.indexOf('添加人员') * key.indexOf('添加时间') * key.indexOf('样式') != 1){
-                    // delete data_object[key]
-                    continue
+                   // delete data_object[key]
+                   continue
                 }
                 else{
-                    temp_result['markerField'][key] = data_object[key]
+                    for(let key1 in layerForm){
+                        if( key == layerForm[key1]){  //如果记录中的键存在于layer的列表中
+                            temp_result['markerField'][key] = data_object[key]
+                        }
+                        else{
+                            continue
+                        }
+                    }
                 }
             }
+            //补充文件缺失的字段
+            if( !temp_result['markerName'] ) temp_result['markerName'] = '';
+            if( !temp_result['latitude'] ) temp_result['latitude'] = 0;
+            if( !temp_result['longitude'] ) temp_result['longitude'] = 0;
+            for(let key in layerForm){
+                if( !temp_result['markerField'][ layerForm[key] ] ) {
+                    temp_result['markerField'][ layerForm[key] ] = ''
+                }
+            }            
+            //固定字段赋值
             temp_result['width'] = 30
             temp_result['height'] = 30
-            temp_result['iconPath'] = '././'//这里要修改
             temp_result['layer_id'] = mongoose.Types.ObjectId(layerId)
+            temp_result['iconPath'] = '../../icons/' + color[Math.floor(Math.random()*8)] 
             temp_result['callout'] = {
                 content: temp_result['markerName'],
                 display: 'BYCLICK'
             }
-
-            //console.log('temp_result', temp_result)
+            
 
         if(await this.IsExisting(temp_result)){ //更新记录，但是不改变id
             this.markerModel.updateOne(
