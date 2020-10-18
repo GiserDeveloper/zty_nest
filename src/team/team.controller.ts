@@ -15,6 +15,11 @@ export class TeamController {
     createTeam(@Body() teamDto: TeamDto){
         return this.teamService.create(teamDto)
     }
+    @Get('getAllTeams')
+    @ApiOperation({summary: '获取所有团队'})
+    getAllTeams(){
+        return this.teamService.findAll()
+    }
 
     @Get(':teamId')
     @ApiParam({
