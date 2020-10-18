@@ -19,14 +19,26 @@ export class TeamuserController {
 
     @Post('joinTeam')
     @ApiQuery({
-        name: 'userId',
+        name: 'userName',
     })
     @ApiQuery({
         name: 'teamId',
     })
     @ApiOperation({summary: '用户加入团队'})
-    joinTeam(@Query('userId') userId,@Query('teamId')  teamId){
-        return this.teamuserService.joinTeam(userId,teamId)
+    joinTeam(@Query('userName') userName,@Query('teamId')  teamId){
+        return this.teamuserService.joinTeam(userName,teamId)
+    }
+
+    @Post('manageTeam')
+    @ApiQuery({
+        name: 'userName',
+    })
+    @ApiQuery({
+        name: 'teamId',
+    })
+    @ApiOperation({summary: '用户加入管理团队'})
+    manageTeam(@Query('userName') userName,@Query('teamId')  teamId){
+        return this.teamuserService.manageTeam(userName,teamId)
     }
 
     @Post('createTeam')
@@ -93,6 +105,16 @@ export class TeamuserController {
         return this.teamuserService.getJoinTeamUsersList(teamId)
     }
 
+    @Get('getManageTeamUsersList/:teamId')
+    @ApiParam({
+        name: 'teamId',
+        description: '请传入teamId'
+    })
+    @ApiOperation({summary: '获取管理团队的用户列表'})
+    getManageTeamUsersList(@Param('teamId') teamId){
+        return this.teamuserService.getManageTeamUsersList(teamId)
+    }
+
     @Put('updateUsersTeamPower/:userId')
     @ApiParam({
         name: 'userId',
@@ -131,6 +153,18 @@ export class TeamuserController {
     @ApiOperation({summary: '把用户移除出团队'})
     removeUserFromTeam(@Query('userId') userId, @Query('teamId') teamId){
         return this.teamuserService.removeUserFromTeam(userId,teamId)
+    }
+
+    @Delete('removeUserFromManageTeam')
+    @ApiQuery({
+        name: 'userId',
+    })
+    @ApiQuery({
+        name: 'teamId',
+    })
+    @ApiOperation({summary: '把用户移除出团队管理员列表'})
+    removeUserFromManageTeam(@Query('userId') userId, @Query('teamId') teamId){
+        return this.teamuserService.removeUserFromManageTeam(userId,teamId)
     }
 
     // 根据用户Id返回用户信息

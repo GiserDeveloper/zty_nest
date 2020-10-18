@@ -22,18 +22,40 @@ export class TeamuserService {
         return await createdTeamUser.save()
     }
 
-    async joinTeam(userId,teamId){
+    async joinTeam(userName,teamId){
         //将用户加入团队
+        let user = await this.teamuserModel.findOne({'weixinName': userName})
+        if(!user){
+            return { error: true, msg: '名字错误'}
+        }
+        else if(user.role == '领导'){
+            return { error: true, msg: '领导不能加入团队'}
+        }
+        else if(user.role == '管理员'){
+            return { error: true, msg: '管理员不能加入团队'}
+        }
+        user = await this.teamuserModel.find({
+            'weixinName': userName,
+            $or:[{
+                "manageTeamList.teamId": mongoose.Types.ObjectId(teamId)
+            },
+            {
+                "joinTeamList.teamId": mongoose.Types.ObjectId(teamId)
+            }]
+        })
+        if(user.length != 0){
+            return { error: true, msg: '用户存在团队中'}
+        }
         return await this.teamuserModel.findOneAndUpdate(
             {
-                _id: mongoose.Types.ObjectId(userId)
+                'weixinName': userName
             },
             {
                 '$addToSet': {
                     joinTeamList: [{
                         'teamId': mongoose.Types.ObjectId(teamId),
                         'defaultMapId': mongoose.Types.ObjectId(teamId),  //加入团队后的默认地图设置？
-                        'power': 0
+                        'power': 1
                     }]
                 }
             },
@@ -180,7 +202,19 @@ export class TeamuserService {
 
     async getJoinTeamUsersList(teamId){
         //根据teamId 返回团队用户列表
-        return await this.teamuserModel.find({"joinTeamList.teamId": mongoose.Types.ObjectId(teamId)})
+        return await this.teamuserModel.aggregate([
+            {
+                $match:{"joinTeamList.teamId": mongoose.Types.ObjectId(teamId), 'role': "普通用户"}
+            },
+            {
+                $unwind: '$joinTeamList'
+            },
+            {
+                $match:{"joinTeamList.teamId": mongoose.Types.ObjectId(teamId)}
+            }
+        ])
+        // console.log(res)
+        // return await this.teamuserModel.find({"joinTeamList.teamId": mongoose.Types.ObjectId(teamId), 'role': "普通用户"}, ['_id','weixinName','role','joinTeamList.teamId','joinTeamList.power'])
     }
 
     async updateUsersTeamPower(userId, teamId, power){
@@ -243,6 +277,7 @@ export class TeamuserService {
     }
 
     async removeUserFromTeam(userId, teamId){
+        //将用户移除出团队
         let userInfo = await this.teamuserModel.findById(mongoose.Types.ObjectId(userId))
         for(var i = 0; i < userInfo.joinTeamList.length; i++){
             if(userInfo.joinTeamList[i].teamId == teamId){
@@ -251,11 +286,97 @@ export class TeamuserService {
                 return await userInfo.save()
             }
         }
+        return {error: true, msg: '用户不在团队成员中'}
+    }
+
+    async removeUserFromManageTeam(userId, teamId){
+        //将用户移除出管理团队
+        let userInfo = await this.teamuserModel.findById(mongoose.Types.ObjectId(userId))
+        for(var i = 0; i < userInfo.manageTeamList.length; i++){
+            if(userInfo.manageTeamList[i].teamId == teamId){
+                userInfo.manageTeamList.splice(i,1)
+                userInfo.markModified('removeTeam')
+                return await userInfo.save()
+            }
+        }
+        return {error: true, msg: '用户不在团队管理员中'}
     }
 
     async getUserInfoById(userId){
         return await this.teamuserModel.findById(mongoose.Types.ObjectId(userId))
     }
+
+
+    async getManageTeamUsersList(teamId){
+        //根据teamId 返回团队管理员列表
+        return await this.teamuserModel.aggregate([
+            {
+                $match:{"manageTeamList.teamId": mongoose.Types.ObjectId(teamId), 'role': "普通用户"}
+            },
+            {
+                $unwind: '$manageTeamList'
+            },
+            {
+                $match:{"manageTeamList.teamId": mongoose.Types.ObjectId(teamId)}
+            }
+        ])
+        // return await this.teamuserModel.find({"manageTeamList.teamId": mongoose.Types.ObjectId(teamId),'role': "普通用户"}, ['_id','weixinName','role','manageTeamList.teamId','manageTeamList.power'])
+    }
+
+    async manageTeam(userName,teamId){
+        //将用户添加为管理员
+        let user = await this.teamuserModel.findOne({'weixinName': userName})
+        if(!user){
+            return { error: true, msg: '名字错误'}
+        }
+        else if(user.role == '领导'){
+            return { error: true, msg: '领导不能加入团队'}
+        }
+        else if(user.role == '管理员'){
+            return { error: true, msg: '管理员不能加入团队'}
+        }
+        user = await this.teamuserModel.find({
+            'weixinName': userName,
+            $or:[{
+                "manageTeamList.teamId": mongoose.Types.ObjectId(teamId)
+            }]
+        })
+        if(user.length != 0){
+            return { error: true, msg: '用户存在团队中'}
+        }
+        return await this.teamuserModel.update(
+            {
+                'weixinName': userName
+            },
+            {
+                '$pull':{
+                    joinTeamList: {
+                        'teamId': mongoose.Types.ObjectId(teamId)
+                    }
+                },
+                '$addToSet': {
+                    manageTeamList: [{
+                        'teamId': mongoose.Types.ObjectId(teamId),
+                        'defaultMapId': mongoose.Types.ObjectId(teamId),  //加入团队后的默认地图设置？
+                        'power': 2
+                    }]
+                }
+            },
+            {
+                new: true
+            }
+        )
+    }
+
+    async deleteUserFormJoinTeam(userId, teamId){
+        //将用户移除出团队
+        
+    }
+
+    async deleUserFormManageTeam(userId,teamId){
+        //将用户移除出管理团队
+    }
+
 }
 
 

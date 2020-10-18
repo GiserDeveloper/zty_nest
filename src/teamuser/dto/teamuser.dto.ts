@@ -15,6 +15,12 @@ export class TeamuserDto{
     })
     defaultTeamId: string;
 
+    @IsString()
+    @ApiProperty({
+        description: '用户角色'
+    })
+    role: string;
+
     @ApiProperty({
         description: '管理团队列表'
     })

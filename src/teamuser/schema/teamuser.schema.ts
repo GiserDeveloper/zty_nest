@@ -9,6 +9,10 @@ export const TeamuserSchema = new Schema({
         type: Schema.Types.ObjectId
     },
 
+    role: {
+        type: String
+    },
+
     manageTeamList: [
         {
             "teamId": Schema.Types.ObjectId,

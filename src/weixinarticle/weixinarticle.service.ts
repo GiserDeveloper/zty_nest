@@ -52,7 +52,7 @@ export class WeixinarticleService {
 
         let res = {}
 
-        let result = await this.weixinarticleModel.find(query).limit(limit).skip(skip)
+        let result = await this.weixinarticleModel.find(query).sort({'time': -1}).limit(limit).skip(skip)
         res['result'] = result
         res['totalPageNum'] = pages
         res['totalNum'] = count
@@ -60,17 +60,21 @@ export class WeixinarticleService {
     }
 
     async initDataBase(){
-        let url = 'D:/imooc/NestJS/zty-project/src/weixinarticle/基建通.json'
-        var self = this
-        let f = fs.readFile(url, "utf-8", function(err, data){
-            // console.log(data);
-            let j = JSON.parse(data);
-            j.forEach(element => {
-                element.type = '基建通'
-                let data = new self.weixinarticleModel(element);
-                data.save()
-            },this);
-            // console.log(j);
-        })
+        let nameList = ['基建通', '超级建筑', '铁路建设规划']
+        for(let i = 0; i < nameList.length; i++){
+            let url = 'D:/zty_nest/src/weixinarticle/'+nameList[i]+'.json'
+            var self = this
+            let f = fs.readFile(url, "utf-8", function(err, data){
+                // console.log(data);
+                let j = JSON.parse(data);
+                j.forEach(element => {
+                    element.type = nameList[i]
+                    let data = new self.weixinarticleModel(element);
+                    data.save()
+                },this);
+                // console.log(j);
+            })
+        } 
+
     }
 }
