@@ -94,4 +94,8 @@ export class NoticeService {
         console.log(id)
         return await this.noticeModel.findById(id)
     }
+
+    async updateNoticeById(id, noticeDto) {
+        return await this.noticeModel.findByIdAndUpdate({ _id: id }, noticeDto, { new: true })
+    }
 }

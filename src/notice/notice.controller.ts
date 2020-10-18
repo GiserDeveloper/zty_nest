@@ -159,4 +159,10 @@ export class NoticeController {
     getNoticeById(@Param('noticeId') noticeId ){
         return this.noticeService.findNoticeById(noticeId)
     }
+
+    @Put('modify')
+    @ApiOperation({summary: '修改公告'})
+    modifyNoticeById(@Query('noticeId') noticeId, @Body() dto){
+        return this.noticeService.updateNoticeById(noticeId,dto)
+    }
 }
