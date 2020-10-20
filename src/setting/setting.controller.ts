@@ -96,4 +96,24 @@ export class SettingController {
     deleteManyByLayerId(@Param('layerId') layerId) {
         return this.settingService.deleteManyByLayerId(layerId)
     }
+
+    @Put('insertUserSettingOfNewUser/:userId')
+    @ApiParam({
+        name: 'userId',
+        description: '请传入userId'
+    })
+    @ApiOperation({ summary: '根据用户ID新建用户配置' })
+    insertUserSettingOfNewUser(@Param('userId') userId) {
+        return this.settingService.insertUserSettingOfNewUser(userId)
+    }
+
+    @Delete('deleteManyByUserId/:userId')
+    @ApiParam({
+        name: 'userId',
+        description: '请传入userId'
+    })
+    @ApiOperation({ summary: '根据用户Id删除用户配置' })
+    deleteManyByUserId(@Param('userId') userId) {
+        return this.settingService.deleteManyByUserId(userId)
+    }
 }

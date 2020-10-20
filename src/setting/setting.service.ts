@@ -101,8 +101,30 @@ export class SettingService {
         return await this.settingModel.insertMany(settingList)
     }
 
+    async insertUserSettingOfNewUser(userId){
+        let layerIdList = await this.layerModel.aggregate(
+            [{
+                $project: {_id: 1}
+            }]
+        )
+        let settingList = new Array()
+        for(let i = 0; i < layerIdList.length; i++){
+            let setting = this.settingModel({
+                userId: mongoose.Types.ObjectId(userId),
+                layerId: mongoose.Types.ObjectId(layerIdList[i]._id),
+                isVisible: true
+            })
+            settingList.push(setting)
+        }
+        return await this.settingModel.insertMany(settingList)
+    }
+
     async deleteManyByLayerId(layerId){
         return await this.settingModel.deleteMany({'layerId': mongoose.Types.ObjectId(layerId)})
+    }
+
+    async deleteManyByUserId(userId){
+        return await this.settingModel.deleteMany({'userId': mongoose.Types.ObjectId(userId)})
     }
 
     async deleteManyByMapId(mapId){
