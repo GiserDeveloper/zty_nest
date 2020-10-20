@@ -5,6 +5,10 @@ export const TeamuserSchema = new Schema({
         type: String
     },
 
+    password: {
+        type: String
+    },
+
     defaultTeamId: {
         type: Schema.Types.ObjectId
     },

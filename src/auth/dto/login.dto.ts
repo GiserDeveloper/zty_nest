@@ -4,7 +4,9 @@ export class LoginDto {
     @ApiProperty({
         description: '登录用户名'
     })
-    username: string
+    //username: string
+    weixinName: string
+ 
     @ApiProperty({
         description: '登录密码'
     })

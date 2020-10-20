@@ -308,6 +308,12 @@ export class TeamuserService {
         return await this.teamuserModel.findById(mongoose.Types.ObjectId(userId))
     }
 
+    async getUserInfoByName(weixinName){
+        return await this.teamuserModel.findOne({
+            weixinName: weixinName
+        })
+    }
+
 
     async getManageTeamUsersList(teamId){
         //根据teamId 返回团队管理员列表

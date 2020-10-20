@@ -3,6 +3,7 @@ import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 
 import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
+import { TeamuserService } from '../teamuser/teamuser.service';
 
 import { AuthGuard } from '@nestjs/passport';
 import { LoginDto } from './dto/login.dto'
@@ -13,7 +14,8 @@ import { RegisterDTO } from './dto/register.dto';
 export class AuthController {
     constructor(
         private readonly userService: UserService,
-        private readonly authService: AuthService
+        private readonly authService: AuthService,
+        private readonly teamuserService: TeamuserService
     ){}
 
     @Post('register')
@@ -36,6 +38,6 @@ export class AuthController {
     @ApiBearerAuth()
     async user(@Req() req){
         //根据用户ID返回用户信息
-        return await this.userService.getUserById(req.user.userId);
+        return await this.teamuserService.getUserInfoById(req.user.userId)
     }
 }
