@@ -104,4 +104,9 @@ export class SettingService {
     async deleteManyByLayerId(layerId){
         return await this.settingModel.deleteMany({'layerId': mongoose.Types.ObjectId(layerId)})
     }
+
+    async deleteManyByMapId(mapId){
+        let layerIdList = await this.layerModel.find({'map_id' : mongoose.Types.ObjectId(mapId)},['_id'])
+        return await this.settingModel.deleteMany({'layerId': {$in: layerIdList}})
+    }
 }

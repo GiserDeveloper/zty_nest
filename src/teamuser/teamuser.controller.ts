@@ -151,8 +151,8 @@ export class TeamuserController {
         name: 'teamId',
     })
     @ApiOperation({summary: '把用户移除出团队'})
-    removeUserFromTeam(@Query('userId') userId, @Query('teamId') teamId){
-        return this.teamuserService.removeUserFromTeam(userId,teamId)
+    async removeUserFromTeam(@Query('userId') userId, @Query('teamId') teamId){
+        return await this.teamuserService.removeUserFromTeam(userId,teamId)
     }
 
     @Delete('removeUserFromManageTeam')
@@ -163,8 +163,8 @@ export class TeamuserController {
         name: 'teamId',
     })
     @ApiOperation({summary: '把用户移除出团队管理员列表'})
-    removeUserFromManageTeam(@Query('userId') userId, @Query('teamId') teamId){
-        return this.teamuserService.removeUserFromManageTeam(userId,teamId)
+    async removeUserFromManageTeam(@Query('userId') userId, @Query('teamId') teamId){
+        return await this.teamuserService.removeUserFromManageTeam(userId,teamId)
     }
 
     // 根据用户Id返回用户信息
@@ -173,8 +173,67 @@ export class TeamuserController {
         name: 'userId'
     })
     @ApiOperation({summary: '根据用户ID返回用户信息'})
-    getUserInfoById(@Param('userId') userId){
-        return this.teamuserService.getUserInfoById(userId)
+    async getUserInfoById(@Param('userId') userId){
+        return await this.teamuserService.getUserInfoById(userId)
     }
 
+    @Post('getUserListByPages')
+    @ApiOperation({summary: '分页查询用户列表'})
+    async getUserListByPages(@Body() queryBody){
+        // let provice = (queryBody.proviceName == "" || !('proviceName' in queryBody) ? {} : {省份:queryBody.proviceName})
+        // let type = (queryBody.typeName == "" || !('typeName' in queryBody)? {} : {type:queryBody.typeName})
+        let page = ('page' in queryBody)? queryBody.page : 1
+        let limit = ('limit' in queryBody)? queryBody.limit : 0
+        var queryInfo = {}
+        if(!('weixinName' in queryBody) || queryBody.weixinName == ''){
+            queryInfo = {
+                '$or': [
+                    { '$and': [
+                        {
+                            'role': {$ne: '管理员'}
+                        }
+                    ]}
+                ]
+            }
+        }
+        else{
+            let weixinName = queryBody.weixinName
+            const reg = new RegExp(weixinName, 'i')
+            queryInfo = {
+                '$or': [
+                    { '$and': [
+                        {
+                            'weixinName': {$regex: reg}
+                        },
+                        {
+                            'role': {$ne: '管理员'}
+                        }
+                    ]}
+                ]
+            }
+        }
+
+        let res = await this.teamuserService.getUserListByPages(queryInfo, page, limit)
+        return res
+    }
+
+    @Post('updateUserinfo/:userId')
+    @ApiParam({
+        name: 'userId',
+        description: '用户Id'
+    })
+    @ApiOperation({summary: '更新用户信息'})
+    async updateUserinfo(@Param('userId') userId, @Body() userinfo){
+        return await this.teamuserService.updateUserInfo(userId,userinfo)
+    }
+
+    @Delete('deleteUserinfo/:userId')
+    @ApiParam({
+        name: 'userId',
+        description: '用户Id'
+    })
+    @ApiOperation({summary: '删除用户信息'})
+    async deleteUserinfo(@Param('userId') userId){
+        return await this.teamuserService.deleteUser(userId)
+    }
 }

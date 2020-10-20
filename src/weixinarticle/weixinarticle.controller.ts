@@ -35,7 +35,7 @@ export class WeixinarticleController {
 
     @Post('queryPageInfo')
     @ApiOperation({summary: '分页查询微信文章(分页)'})
-    getNoticeInfoByPage(@Body() queryBody){
+    async getNoticeInfoByPage(@Body() queryBody){
         // let provice = (queryBody.proviceName == "" || !('proviceName' in queryBody) ? {} : {省份:queryBody.proviceName})
         let type = (queryBody.typeName == "" || !('typeName' in queryBody)? {} : {type:queryBody.typeName})
         let page = ('page' in queryBody)? queryBody.page : 1
@@ -65,7 +65,7 @@ export class WeixinarticleController {
             }
         }
 
-        let res = this.weixinarticleService.findNoticesByPages(queryInfo, page, limit)
+        let res = await this.weixinarticleService.findNoticesByPages(queryInfo, page, limit)
         return res
 
     }

@@ -21,6 +21,12 @@ export class TeamuserDto{
     })
     role: string;
 
+    @IsString()
+    @ApiProperty({
+        description: '密码'
+    })
+    password: string;
+
     @ApiProperty({
         description: '管理团队列表'
     })

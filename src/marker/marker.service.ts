@@ -236,6 +236,11 @@ export class MarkerService {
         ])
     }
 
+    async deleteMakersByMapId(mapId){
+        let layerIdList = await this.layerModel.find({'map_id' : mongoose.Types.ObjectId(mapId)},['_id'])
+        return await this.markerModel.deleteMany({'layer_id': {$in: layerIdList}})
+    }
+
     // 根据点ID返回点所带的图片
     //Excel格式化导出数据（yzy）
     ////获取数据

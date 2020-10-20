@@ -6,7 +6,7 @@ import { LayerDto, modifyLayerFieldDto } from './dto/layer.dto';
 
 import { Marker } from '../marker/schema/marker.schema';
 // import { SettingSchema } from '../setting/schema/setting.schema'
-import { TeamuserSchema } from '../teamuser/schema/teamuser.schema'
+// import { TeamuserSchema } from '../teamuser/schema/teamuser.schema'
 import { arrayContains } from 'class-validator';
 
 
@@ -19,7 +19,7 @@ export class LayerService {
         @InjectModel('Layer') private layerModel: Model<Layer>,
         @InjectModel('Marker') private markerModel: Model<Marker>,
         // @InjectModel('SettingSchema') private settingModel,
-        @InjectModel('TeamUser') private teamuserModel
+        // @InjectModel('TeamUser') private teamuserModel
     ) {}
 
     async create(layerDto): Promise<Layer> {
@@ -128,4 +128,9 @@ export class LayerService {
             }]
         )
     }
+
+    async deleteLayerByMapId(mapId){
+        return await this.layerModel.deleteMany({'map_id': mongoose.Types.ObjectId(mapId)})
+    }
+
 }

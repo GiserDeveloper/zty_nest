@@ -18,6 +18,8 @@ export class TeamuserService {
     ) {}
 
     async create(teamuserDto: TeamuserDto){
+        teamuserDto.manageTeamList = null
+        teamuserDto.joinTeamList = null
         const createdTeamUser = new this.teamuserModel(teamuserDto)
         return await createdTeamUser.save()
     }
@@ -376,6 +378,46 @@ export class TeamuserService {
     async deleUserFormManageTeam(userId,teamId){
         //将用户移除出管理团队
     }
+
+    async getUserListByPages(query: object, page: number, limit: number){
+        let count = await this.teamuserModel.find(query).countDocuments()
+        //计算总页数
+        let pages = Math.ceil(count / limit);
+        //取值不能超过pages
+        page = Math.min(page, pages);
+        //取值不能小于1
+        page = Math.max(page, 1);
+        let skip = (page - 1) * limit;
+
+        let res = {}
+
+        let result = await this.teamuserModel.find(query,['_id','weixinName','password','role']).sort({'role': -1}).limit(limit).skip(skip)
+        res['result'] = result
+        res['totalPageNum'] = pages
+        res['totalNum'] = count
+        return res
+    }
+
+    async updateUserInfo(userId, userInfo:TeamuserDto){
+        //更新用户信息
+        return await this.teamuserModel.findOneAndUpdate(
+            {
+                _id: userId
+            },
+            {
+                $set: userInfo
+            },
+            {
+                new: true
+            }
+        )
+    }
+
+    async deleteUser(userId){
+        //删除用户信息
+        return await this.teamuserModel.delete({_id: mongoose.Types.ObjectId(userId)})
+    }
+
 
 }
 

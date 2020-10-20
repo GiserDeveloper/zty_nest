@@ -48,5 +48,9 @@ export class MapService {
             'team_Id': mongoose.Types.ObjectId(teamId)
         })
     }
+
+    async deletMapById(mapId){
+        return await this.mapModel.deleteOne({_id: mongoose.Types.ObjectId(mapId)})
+    }
 }
 

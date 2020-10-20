@@ -3,11 +3,19 @@ import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth, ApiQuery } from '@nestj
 import { MapService } from './map.service';
 import { MapDto } from './dto/map.dto';
 
+import { LayerService } from '../layer/layer.service'
+import { SettingService } from '../setting/setting.service'
+import { MarkerService} from '../marker/marker.service'
+
 @Controller('map')
 @ApiTags('地图模块')
 export class MapController {
     constructor(
-        private readonly mapService: MapService
+        private readonly mapService: MapService,
+        private readonly layerService: LayerService,
+        private readonly settingService: SettingService,
+        private readonly markerService: MarkerService,
+
     ){}
 
     @Post()
@@ -41,6 +49,21 @@ export class MapController {
     @ApiOperation({summary: '获取团队中地图列表'})
     getmMapListByTeamId(@Param('teamId') teamId){
         return this.mapService.getMapListByTeamId(teamId)
+    }
+
+    @Delete('deleteMap/:mapId')
+    @ApiParam({
+        name: 'mapId',
+        description: '请传入地图id'
+    })
+    @ApiOperation({summary: '获取团队中地图列表'})
+    async deleteMapById(@Param('mapId') mapId){
+        console.log(mapId)
+        await this.settingService.deleteManyByMapId(mapId)
+        await this.markerService.deleteMakersByMapId(mapId)
+        await this.layerService.deleteLayerByMapId(mapId)
+        return await this.mapService.deletMapById(mapId)
+        // return this.mapService.getMapListByTeamId(mapID)
     }
 }
 
