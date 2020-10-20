@@ -17,10 +17,6 @@ export const TeamuserSchema = new Schema({
         type: String
     },
 
-    password: {
-        type: String
-    },
-
     manageTeamList: [
         {
             "teamId": Schema.Types.ObjectId,
