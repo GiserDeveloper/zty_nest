@@ -213,6 +213,14 @@ export class TeamuserService {
             },
             {
                 $match:{"joinTeamList.teamId": mongoose.Types.ObjectId(teamId)}
+            },
+            {
+                $project: { '_id': 1, 'weixinName': 1, 'joinTeamList': 1}
+            },
+            {
+                $sort: {
+                    "joinTeamList._id": 1
+                }
             }
         ])
         // console.log(res)
@@ -326,6 +334,14 @@ export class TeamuserService {
             },
             {
                 $match:{"manageTeamList.teamId": mongoose.Types.ObjectId(teamId)}
+            },
+            {
+                $project: { '_id': 1, 'weixinName': 1, 'manageTeamList': 1}
+            },
+            {
+                $sort: {
+                    "manageTeamList._id": 1
+                }
             }
         ])
         // return await this.teamuserModel.find({"manageTeamList.teamId": mongoose.Types.ObjectId(teamId),'role': "普通用户"}, ['_id','weixinName','role','manageTeamList.teamId','manageTeamList.power'])
