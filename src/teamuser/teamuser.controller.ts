@@ -247,4 +247,18 @@ export class TeamuserController {
         console.log(passwordList)
         return await this.teamuserService.updatePassword(userId,passwordList.oldPassword,passwordList.newPassword)
     }
+
+    @Get('getPower')
+    @ApiQuery({
+        name: 'userId',
+        description: "用户Id"
+    })
+    @ApiQuery({
+        name: 'teamId',
+        description: "团队Id"
+    })
+    @ApiOperation({summary: '获取用户权限'})
+    async getUserPower(@Query('userId') userId, @Query('teamId') teamId){
+        return await this.teamuserService.getUserPower(userId,teamId)
+    }
 }

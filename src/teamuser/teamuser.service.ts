@@ -457,6 +457,46 @@ export class TeamuserService {
         })
     }
 
+    async getUserPower(userId,teamId){
+        let userinfo = await this.teamuserModel.findOne({_id: mongoose.Types.ObjectId(userId)})
+        if(userinfo.role == "领导"){
+            return {power: 1}
+        }
+        let joinTeamRes = await this.teamuserModel.aggregate([
+            {
+                $match: {_id: mongoose.Types.ObjectId(userId)}
+            },
+            {
+                $unwind: '$joinTeamList'
+            },
+            {
+                $match:{"joinTeamList.teamId": mongoose.Types.ObjectId(teamId)}
+            },
+            {
+                $project: {"joinTeamList.power": 1}
+            }
+        ])
+
+        if(joinTeamRes.length != 0){
+            return {power: joinTeamRes[0].joinTeamList.power}
+        }
+
+        let res = await this.teamuserModel.aggregate([
+            {
+                $match: { _id: mongoose.Types.ObjectId(userId)}
+            },
+            {
+                $unwind: '$manageTeamList'
+            },
+            {
+                $match:{"manageTeamList.teamId": mongoose.Types.ObjectId(teamId)}
+            },
+            {
+                $project: {"manageTeamList.power": 1, 'role': 1}
+            }
+        ])
+        return {power: res[0].manageTeamList.power}
+    }
 }
 
 
