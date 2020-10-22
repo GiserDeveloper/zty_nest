@@ -32,7 +32,7 @@ export class Marker extends Document {
     callout: object;
 
     @Prop({
-        unique: true
+        // unique: true
     })
     markerName: string;
 

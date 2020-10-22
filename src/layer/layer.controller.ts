@@ -96,4 +96,20 @@ export class LayerController {
     // addLayerField2(@Body() deleteLayerFieldContent: modifyLayerFieldDto) {
     //     return this.layerService.addLayerField2(deleteLayerFieldContent, deleteLayerFieldContent.modifyLayerId)
     // }
+
+    // 修改图层字段
+    @Put('modifyLayerField')
+    @ApiQuery({
+        name: 'layerId',
+        description: '请传入待修改图层id'
+    })
+    @ApiQuery({
+        name: 'oldField',
+    })
+    @ApiQuery({
+        name: 'newField'
+    })
+    modifyLayerField(@Query('layerId') layerId, @Query('oldField') oldField, @Query('newField') newField){
+        return this.layerService.modifyLayerField(layerId, oldField, newField)
+    }
 }

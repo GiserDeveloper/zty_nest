@@ -133,4 +133,24 @@ export class LayerService {
         return await this.layerModel.deleteMany({'map_id': mongoose.Types.ObjectId(mapId)})
     }
 
+    async modifyLayerField(modifyLayerId, oldfieldContent, newfieldContent){
+        let layerId = mongoose.Types.ObjectId(modifyLayerId)
+        await this.layerModel.updateOne({
+            _id: layerId,
+            fieldList: oldfieldContent,
+        },{
+            $set: {
+                "fieldList.$": newfieldContent
+            }
+        })
+        let tmp = {}
+        tmp[`markerField.${oldfieldContent}`] = `markerField.${newfieldContent}`
+        console.log(tmp)
+        return await this.markerModel.updateMany({
+            layer_id: layerId,
+        },{
+            $rename: tmp
+        })
+    }
+
 }
