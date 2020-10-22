@@ -440,6 +440,22 @@ export class TeamuserService {
         return await this.teamuserModel.delete({_id: mongoose.Types.ObjectId(userId)})
     }
 
+    async updatePassword(userId, oldPassword, newPassword){
+        let userInfo = await this.teamuserModel.findOne({_id: mongoose.Types.ObjectId(userId)})
+        console.log(userInfo.password)
+        if(oldPassword != userInfo.password){
+            return {error: true, msg: '密码错误'}
+        }
+        return　await this.teamuserModel.findOneAndUpdate({
+            _id: userId
+        },
+        {
+            $set: {password : newPassword}
+        },
+        {
+            new: true
+        })
+    }
 
 }
 

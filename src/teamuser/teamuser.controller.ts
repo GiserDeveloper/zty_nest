@@ -236,4 +236,15 @@ export class TeamuserController {
     async deleteUserinfo(@Param('userId') userId){
         return await this.teamuserService.deleteUser(userId)
     }
+
+    @Post('updatePassword/:userId')
+    @ApiParam({
+        name: 'userId',
+        description: '用户Id'
+    })
+    @ApiOperation({summary: '修改用户密码'})
+    async updatePassword(@Param('userId') userId, @Body() passwordList){
+        console.log(passwordList)
+        return await this.teamuserService.updatePassword(userId,passwordList.oldPassword,passwordList.newPassword)
+    }
 }
