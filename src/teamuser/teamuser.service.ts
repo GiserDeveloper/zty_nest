@@ -17,9 +17,9 @@ export class TeamuserService {
         @InjectModel('Map') private mapModel
     ) {}
 
-    async create(teamuserDto: TeamuserDto){
-        teamuserDto.manageTeamList = null
-        teamuserDto.joinTeamList = null
+    async create(teamuserDto){
+        teamuserDto.manageTeamList = []
+        teamuserDto.joinTeamList = []
         const createdTeamUser = new this.teamuserModel(teamuserDto)
         return await createdTeamUser.save()
     }
