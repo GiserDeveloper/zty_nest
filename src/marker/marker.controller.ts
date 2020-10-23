@@ -1,22 +1,22 @@
 import { Controller, Post, Body, Get, Param, Put, Delete, UsePipes, ValidationPipe, UseGuards, Query, Request, Response, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
-import {FileInterceptor} from '@nestjs/platform-express'
+import { FileInterceptor } from '@nestjs/platform-express'
 import { MarkerService } from './marker.service';
 import { MarkerDto, modifyMarkerFieldDto } from './dto/marker.dto';
 import { fstat } from 'fs';
 // import 'utils';
 const formidable = require("formidable");
 const path = require("path");
-var fs= require('fs')
+var fs = require('fs')
 
 
-function delDir(path){
+function delDir(path) {
     let files = [];
-    if(fs.existsSync(path)){
+    if (fs.existsSync(path)) {
         files = fs.readdirSync(path);
         files.forEach((file, index) => {
             let curPath = path + "/" + file;
-            if(fs.statSync(curPath).isDirectory()){
+            if (fs.statSync(curPath).isDirectory()) {
                 delDir(curPath); //递归删除文件夹
             } else {
                 fs.unlinkSync(curPath); //删除文件
@@ -102,7 +102,7 @@ export class MarkerController {
     @ApiOperation({
         summary: '删除点字段'
     })
-    deleteMarkerField(@Body() deleteMarkerFieldContent: modifyMarkerFieldDto){
+    deleteMarkerField(@Body() deleteMarkerFieldContent: modifyMarkerFieldDto) {
         return this.markerService.deleteMarkerField(deleteMarkerFieldContent, deleteMarkerFieldContent.modifyLayerId)
     }
 
@@ -134,8 +134,8 @@ export class MarkerController {
         name: 'markerId',
         description: '请传入点id'
     })
-    @ApiOperation({summary: '传入点id删除点'})
-    deleteMarkerByName(@Param('markerId') markerId){
+    @ApiOperation({ summary: '传入点id删除点' })
+    deleteMarkerByName(@Param('markerId') markerId) {
         return this.markerService.deleteMarker(markerId);
     }
 
@@ -144,14 +144,14 @@ export class MarkerController {
         name: 'layerId',
         description: '请传入图层id'
     })
-    @ApiOperation({summary: '传入图层id删除点'})
-    deleteMarkersByLayerId(@Param('layerId') layerId){
+    @ApiOperation({ summary: '传入图层id删除点' })
+    deleteMarkersByLayerId(@Param('layerId') layerId) {
         return this.markerService.deleteMarkers(layerId);
-    }  
+    }
 
     @Get('test')
-    @ApiOperation({summary: 'test'})
-    test(){
+    @ApiOperation({ summary: 'test' })
+    test() {
         return this.markerService.test()
     }
 
@@ -173,31 +173,31 @@ export class MarkerController {
     @ApiOperation({
         summary: '测试'
     })
-    testZty(@Param('mapId') mapId){
+    testZty(@Param('mapId') mapId) {
         return this.markerService.testZTY(mapId)
     }
 
     @Post('testUpload')
-    async testUpload(@Request() req, @Response() res, @Query('markerId') markerId){
+    async testUpload(@Request() req, @Response() res, @Query('markerId') markerId) {
         var form = new formidable.IncomingForm();
         form.keepExtensions = true;
         form.multiples = true;
-        var upLoadPath = path.join(__dirname,'../../public/'+ markerId);
+        var upLoadPath = path.join(__dirname, '../../public/' + markerId);
         // fs.mkdir(upLoadPath,(err)=>{})
-        await fs.exists(upLoadPath, function(exists){
-            if(!exists){
-                fs.mkdir(upLoadPath,(err)=>{})
+        await fs.exists(upLoadPath, function (exists) {
+            if (!exists) {
+                fs.mkdir(upLoadPath, (err) => { })
             }
         })
         form.uploadDir = upLoadPath
-        let tmp = await new Promise((resolve, reject)=>{
-            form.parse(req, (err, fields, files)=>{
-                if(err){
+        let tmp = await new Promise((resolve, reject) => {
+            form.parse(req, (err, fields, files) => {
+                if (err) {
                     reject(err)
                 }
-                else{
+                else {
                     resolve(fields)
-                }    
+                }
                 //form.uploadDir =path.join(__dirname,"my/" + files['markerId']);
             })
         })
@@ -206,21 +206,21 @@ export class MarkerController {
     }
 
     @Post('testUpload2')
-    async testUpload2(@Request() req, @Response() res, @Query('markerId') markerId, @Query('imgUrl') imgUrl){
+    async testUpload2(@Request() req, @Response() res, @Query('markerId') markerId, @Query('imgUrl') imgUrl) {
         var form = new formidable.IncomingForm();
         form.keepExtensions = true;
         form.multiples = true;
-        var upLoadPath = path.join(__dirname,'../../public/'+ markerId);
+        var upLoadPath = path.join(__dirname, '../../public/' + markerId);
         //fs.mkdir(upLoadPath,(err)=>{})
         form.uploadDir = upLoadPath
-        let tmp = await new Promise((resolve, reject)=>{
-            form.parse(req, (err, fields, files)=>{
-                if(err){
+        let tmp = await new Promise((resolve, reject) => {
+            form.parse(req, (err, fields, files) => {
+                if (err) {
                     reject(err)
                 }
-                else{
+                else {
                     resolve(fields)
-                }    
+                }
                 //form.uploadDir =path.join(__dirname,"my/" + files['markerId']);
             })
         })
@@ -229,54 +229,58 @@ export class MarkerController {
     }
 
     @Get('deleteImg')
-    async deleteImg(@Query('markerId') markerId, @Query('imgUrl') imgUrl){
-        if(imgUrl.indexOf(':3000')!=-1){
+    async deleteImg(@Query('markerId') markerId, @Query('imgUrl') imgUrl) {
+        if (imgUrl.indexOf(':3000') != -1) {
             // 删除服务器的图片
-            let filePath = path.join(__dirname, '../../public/' + markerId) +'/' + imgUrl.split(markerId + '/')[1]
+            let filePath = path.join(__dirname, '../../public/' + markerId) + '/' + imgUrl.split(markerId + '/')[1]
             return fs.unlinkSync(filePath); //删除文件
         }
         return '图片不存在'
     }
 
     @Get('testDownLoad')
-    async testDownLoad(@Query('markerId') markerId){
+    async testDownLoad(@Query('markerId') markerId) {
         let downLoadPath = path.join(__dirname, '../../public/' + markerId);
-        let imgUrls = fs.readdirSync(downLoadPath);
-        let imgUrlsRes = []
-        for(let imgUrl of imgUrls){
-            let tmp = 'http://localhost:3000/public' + '/' + markerId + '/' + imgUrl
-            imgUrlsRes.push(tmp)
+        try{
+            let imgUrls = fs.readdirSync(downLoadPath);
+            let imgUrlsRes = []
+            for (let imgUrl of imgUrls) {
+                let tmp = 'http://localhost:3000/public' + '/' + markerId + '/' + imgUrl
+                imgUrlsRes.push(tmp)
+            }
+            return imgUrlsRes
+        }catch(err){
+            // return err
         }
-        return imgUrlsRes
     }
 
-      //下载数据
-      @Get('download/:layer_id')
-      @ApiParam({
-          name:'layer_id',
-          description:'请输入图层编号'
-      })
-      @ApiOperation({summary:'导出图层所有记录至excel表格'})
-      async donwloadfile(@Param() param, @Response() res){
-          console.log('文件导出功能执行成功!')
-          let data = await this.markerService.excelExport(param.layer_id)
-          res.setHeader('Content-Type', 'application/vnd.ms-excel')
+    //下载数据
+    @Get('download/:layer_id')
+    @ApiParam({
+        name: 'layer_id',
+        description: '请输入图层编号'
+    })
+    @ApiOperation({ summary: '导出图层所有记录至excel表格' })
+    async donwloadfile(@Param() param, @Response() res) {
+        console.log('文件导出功能执行成功!')
+        let data = await this.markerService.excelExport(param.layer_id)
+        res.setHeader('Content-Type', 'application/vnd.ms-excel')
         //   res.setHeader('responseType','blob')
-          res.send(data)
-      }
-  
-      //上传数据
-      @Post('upload/:layer_id')
-      @ApiParam({
-          name:'layer_id',
-          description:'请输入图层编号'
-      })
-      @ApiOperation({summary:'导入excel记录'})
-      @UseInterceptors(FileInterceptor('file'))
-      
-      uploadFile(@UploadedFile() file, @Param() param){
+        res.send(data)
+    }
+
+    //上传数据
+    @Post('upload/:layer_id')
+    @ApiParam({
+        name: 'layer_id',
+        description: '请输入图层编号'
+    })
+    @ApiOperation({ summary: '导入excel记录' })
+    @UseInterceptors(FileInterceptor('file'))
+
+    uploadFile(@UploadedFile() file, @Param() param) {
         console.log('文件导入功能执行成功!')
         return this.markerService.excelImport(file.buffer, param.layer_id)
-      }
+    }
 }
 
