@@ -263,7 +263,7 @@ export class TeamuserService {
         //修改团队的默认地图ID
 
         let mapinfoOrigin = await this.mapModel.findById(mongoose.Types.ObjectId(mapId))
-        let mapinfo = mapinfoOrigin.toObject()
+        let mapinfo = mapinfoOrigin? mapinfoOrigin.toObject() : {}
         if(mapinfo.team_Id != teamId){
             return '团队中没有该地图'
         }
