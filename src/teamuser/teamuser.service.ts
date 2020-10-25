@@ -7,10 +7,12 @@ import { TeamuserDto } from './dto/teamuser.dto';
 import { Team } from '../team/schema/team.schema';
 import { Map } from 'src/map/schema/map.schema';
 
+const util = require('util');
+const exec = util.promisify(require('child_process').exec);
 // import { exec } from 'child_process';
 // import { stderr } from 'process';
 // import { resolve } from 'path';
-const execSync = require('child_process').execSync;
+// const execSync = require('child_process').execSync;
 // const spawn = require('child_process').spawn
 const iconv = require('iconv-lite');
 
@@ -599,8 +601,9 @@ export class TeamuserService {
         //         }
         //     })
         // })
-        const output = execSync('python D:/teamuser/Web1_采购与招标网_10.16.py '+projectName)
-        let str = iconv.decode(output,'gb2312').toString()
+        // const output = execSync('python D:/teamuser/Web1_采购与招标网_10.16.py '+projectName)
+        const { stdout, stderr } = await exec('python D:/teamuser/Web1_采购与招标网_10.16.py '+projectName, { encoding: 'buffer' });
+        let str = iconv.decode(stdout,'cp936').toString()
         let rightStr = str.replace(/'/g, '"')
         return JSON.parse(rightStr)
     }
@@ -646,20 +649,23 @@ export class TeamuserService {
 
         }
 
-        //console.log(newProjectList)
-        await this.teamuserModel.findOneAndUpdate(
-            {_id: mongoose.Types.ObjectId(userId)},
-            {careProjectList: newProjectList},
-            {new: true}
-        )   //更新数据库中的时间，使用异步操作
+        // //console.log(newProjectList)
+        // await this.teamuserModel.findOneAndUpdate(
+        //     {_id: mongoose.Types.ObjectId(userId)},
+        //     {careProjectList: newProjectList},
+        //     {new: true}
+        // )   //更新数据库中的时间，使用异步操作
         
         return newProjInfos
     }
 
     //搜索项目记录的接口
     async getAllInfo(projectName){
-        const output = execSync('python D:/teamuser/采购与招标网_搜索.py '+projectName)
-        let str = iconv.decode(output,'gb2312').toString()
+        // const output = execSync('python D:/teamuser/采购与招标网_搜索.py '+projectName)
+        const { stdout, stderr } = await exec('python D:/teamuser/采购与招标网_搜索.py '+projectName, { encoding: 'buffer' });
+
+        let str = iconv.decode(stdout,'cp936').toString()
+        // console.log(stdout.toString())
         let rightStr = str.replace(/'/g, '"')
         return JSON.parse(rightStr)
     }
