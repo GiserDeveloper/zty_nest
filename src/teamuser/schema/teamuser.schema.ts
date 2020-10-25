@@ -12,6 +12,14 @@ export const TeamuserSchema = new Schema({
     defaultTeamId: {
         type: Schema.Types.ObjectId
     },
+    
+    careProjectList:[
+        {
+            'projectName': String,
+            'latestDate': String
+        }
+    ],
+
 
     role: {
         type: String

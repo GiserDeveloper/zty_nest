@@ -261,4 +261,60 @@ export class TeamuserController {
     async getUserPower(@Query('userId') userId, @Query('teamId') teamId){
         return await this.teamuserService.getUserPower(userId,teamId)
     }
+
+        //用户添加关注的项目信息
+        @Get('addCareProject')
+        @ApiQuery({
+            name:'userId'
+        })
+        @ApiQuery({
+            name:'projectName'
+        })
+        @ApiOperation({summary: '用户增加关注的项目信息'})
+        addCareProject(@Query('userId') userId, @Query('projectName') projectName){
+            return this.teamuserService.addCareProject(userId, projectName)
+        }
+    
+    //用户删除关注的项目信息
+    @Get('deleteCareProject')
+    @ApiQuery({
+        name:'userId'
+    })
+    @ApiQuery({
+        name:'projectName'
+    })
+    @ApiOperation({summary: '用户删除关注的项目信息'})
+    deleteCareProject(@Query('userId') userId, @Query('projectName') projectName){
+        return this.teamuserService.deleteCareProject(userId, projectName)
+    }
+    
+    //返回用户关注列表信息
+    @Post('getCareProjectList')
+    @ApiQuery({
+        name:'userId'
+    })
+    @ApiOperation({summary:'返回用户关注列表信息'})
+    getCareProjectList(@Query('userId') userId){
+        return this.teamuserService.getCareProjectList(userId)
+    }
+
+    //检查是否有更新信息
+    @Post('checkNewInfo')
+    @ApiQuery({
+        name: 'userId'
+    })
+    @ApiOperation({summary: '检查是否有更新消息'})
+    checkNewInfo(@Query('userId') userId){
+        return this.teamuserService.checkNewInfo(userId)
+    }
+
+    //搜索项目记录
+    @Post('projectAllInfo')
+    @ApiQuery({
+        name:'projectName'
+    })
+    @ApiOperation({summary:'搜索项目所有记录'})
+    getAllInfo(@Query('projectName') projectName){
+        return this.teamuserService.getAllInfo(projectName)
+    }
 }

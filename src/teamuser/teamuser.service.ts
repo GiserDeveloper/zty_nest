@@ -7,6 +7,13 @@ import { TeamuserDto } from './dto/teamuser.dto';
 import { Team } from '../team/schema/team.schema';
 import { Map } from 'src/map/schema/map.schema';
 
+// import { exec } from 'child_process';
+// import { stderr } from 'process';
+// import { resolve } from 'path';
+const execSync = require('child_process').execSync;
+// const spawn = require('child_process').spawn
+const iconv = require('iconv-lite');
+
 let mongoose=require('mongoose');
 
 @Injectable()
@@ -20,6 +27,7 @@ export class TeamuserService {
     async create(teamuserDto){
         teamuserDto.manageTeamList = []
         teamuserDto.joinTeamList = []
+        teamuserDto.careProjectList = []
         const createdTeamUser = new this.teamuserModel(teamuserDto)
         return await createdTeamUser.save()
     }
@@ -497,6 +505,165 @@ export class TeamuserService {
         ])
         return {power: res[0].manageTeamList.power}
     }
+
+      //新增用户关注项目
+      async addCareProject(userId, newProjectName){
+        let userInfo = await this.teamuserModel.findById(mongoose.Types.ObjectId(userId))
+        let ProjList = userInfo.careProjectList
+        let newProjectInfo = {'projectName':'', 'latestDate':''}
+        let mydate = new Date()  //为时间戳做准备
+
+        for(let key in ProjList){  //若该项目已收藏，则返回已有该记录
+            if(ProjList[key]['projectName'] == newProjectName)   return '已有该记录！'
+        }
+
+        newProjectInfo.projectName = newProjectName
+        newProjectInfo.latestDate = mydate.getFullYear() + '-' + (mydate.getMonth() + 1) + '-' + mydate.getDate() //加入今天的时间戳
+        ProjList.push(newProjectInfo) //将新记录插入收藏数组中
+
+        await this.teamuserModel.findOneAndUpdate(
+                {_id: mongoose.Types.ObjectId(userId)},
+                {careProjectList: ProjList},
+                {new: true}
+        ) 
+
+        return '添加关注项目：' + newProjectName
+    }
+
+
+    //删除用户关注项目
+    async deleteCareProject(userId, deleteProjectName){
+        let userInfo = await this.teamuserModel.findById(mongoose.Types.ObjectId(userId))
+        let newProjList = userInfo.careProjectList
+        let existFlag = 0 //判断要删除的项目在不在
+
+        for(let key in newProjList){  //通过遍历原有数组找到要删除的记录
+            if(newProjList[key]['projectName'] == deleteProjectName){
+                newProjList.splice(key, 1) //根据索引删除该条记录
+                existFlag = 1
+            }
+        }
+
+        if(existFlag == 0){
+            return '该项目不存在收藏列表内！'
+        }
+
+        await this.teamuserModel.findOneAndUpdate(
+            {_id: mongoose.Types.ObjectId(userId)},
+            {careProjectList: newProjList},
+            {new: true}
+        )
+
+        return '取消关注项目: '+ deleteProjectName
+    }
+    
+    //获取用户关注列表
+    async getCareProjectList(userId){
+        return await this.teamuserModel.find(
+            {_id: mongoose.Types.ObjectId(userId)},
+            ['weixinName', 'careProjectList', '_id']
+
+        )
+    }
+
+
+    //查看项目是否有更新
+    async getNewCareInfo(projectName){
+        // 调用爬虫获取信息
+        //进程流方法
+        // console.log(projectName)
+        // return new Promise((resolve, reject) => {
+        //     const  sp = spawn('python',['D:/EnglishPath/Web1_采购与招标网_10.16.py '+projectName], {shell:true})
+
+        //     sp.on('error',(err) => {
+        //         console.log(err)
+        //         reject(err)
+        //     })
+    
+        //     sp.stdout.on('data', (data)=>{
+        //         let str = iconv.decode(data,'gb2312').toString()
+        //         let rightStr = str.replace(/'/g, '"')
+        //         //console.log(str.replace(/'/g, '"')) 
+        //         resolve(JSON.parse(rightStr))  //将二进制文件流转为JSON数组
+        //     })
+    
+        //     sp.stderr.on('data', (data) => {
+        //         console.log('stderr');
+        //         //console.log(data)
+        //         //console.error(`sp 的 stderr: ${data}`);
+        //     })
+    
+        //     sp.on('close', (code) => {
+        //         if (code !== 0) {
+        //             console.log(`sp 进程退出，退出码 ${code}`);
+        //         }
+        //     })
+        // })
+        const output = execSync('python D:/teamuser/Web1_采购与招标网_10.16.py '+projectName)
+        let str = iconv.decode(output,'gb2312').toString()
+        let rightStr = str.replace(/'/g, '"')
+        return JSON.parse(rightStr)
+    }
+
+
+
+    async checkNewInfo(userId){
+        let userInfo = await this.teamuserModel.findById(mongoose.Types.ObjectId(userId))
+        let ProjList = userInfo.careProjectList
+        let newProjectList = ProjList //更新数据库中记录的最新时间
+        let newProjInfos = []  //返回新消息的容器
+
+        if( !ProjList || ProjList.length == 0 ){  //若个人数据中不存在项目列表或列表为空，则返回无关注
+            return '暂无关注项目'
+        }
+
+        for(let key in ProjList){  //列表中每个项目都调用爬虫
+            let temp_Info = {'projectName':'', 'news':[],'newCount':0 , 'IsUpdate':false}  //返回的格式  名称，新消息内容，更新标
+            temp_Info.projectName = ProjList[key]['projectName']
+
+            let projectInfo = {}
+            projectInfo = await this.getNewCareInfo(ProjList[key]['projectName'])   //调用爬虫获取项目所有的消息
+            for (let key1 in projectInfo){   //逐条消息比对时间
+                if( projectInfo[key1]['date'] > ProjList[key]['latestDate']){ //对爬到的每一条新闻，都和最近时间比较，若更新一些，则放入news中
+                    temp_Info.news.push(projectInfo[key1])
+                }
+            }
+            
+            //console.log(temp_Info.news)
+
+            if( temp_Info['news'][0]  ){
+                temp_Info.IsUpdate = true  //如果news中有记录，则将更新标变更为true
+                newProjectList[key]['latestDate'] = projectInfo[0]['date']  //用新消息中的最新时间更新项目的时间戳
+                
+            }
+
+            temp_Info['newCount'] = temp_Info['news'].length  //获取新消息条数
+            delete temp_Info['news']  //删除新消息字段
+
+            if( temp_Info.IsUpdate == true){
+                newProjInfos.push(temp_Info)
+            }
+
+        }
+
+        //console.log(newProjectList)
+        await this.teamuserModel.findOneAndUpdate(
+            {_id: mongoose.Types.ObjectId(userId)},
+            {careProjectList: newProjectList},
+            {new: true}
+        )   //更新数据库中的时间，使用异步操作
+        
+        return newProjInfos
+    }
+
+    //搜索项目记录的接口
+    async getAllInfo(projectName){
+        const output = execSync('python D:/teamuser/采购与招标网_搜索.py '+projectName)
+        let str = iconv.decode(output,'gb2312').toString()
+        let rightStr = str.replace(/'/g, '"')
+        return JSON.parse(rightStr)
+    }
+
 }
 
 
