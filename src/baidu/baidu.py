@@ -12,7 +12,7 @@ import json
 # driver = webdriver.Chrome()
 # driver.implicitly_wait(15)
 
-driver = webdriver.Chrome()
+driver = webdriver.Chrome(executable_path="D:\imooc\spider_final\WebSpider\WebSpider\chromedriver.exe")
 driver.implicitly_wait(15)
 
 # 指定搜索关键词与限定网站

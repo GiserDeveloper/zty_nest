@@ -184,12 +184,18 @@ export class MarkerController {
         form.multiples = true;
         var upLoadPath = path.join(__dirname, '../../public/' + markerId);
         // fs.mkdir(upLoadPath,(err)=>{})
-        await fs.exists(upLoadPath, function (exists) {
-            if (!exists) {
-                fs.mkdir(upLoadPath, (err) => { })
-            }
+        await new Promise((resolve, reject)=>{
+            fs.exists(upLoadPath, function (exists) {
+                if (!exists) {
+                    fs.mkdir(upLoadPath, (err) => { })
+                    form.uploadDir = upLoadPath
+                    resolve()
+                }else{
+                    form.uploadDir = upLoadPath
+                    resolve()
+                }
+            })
         })
-        form.uploadDir = upLoadPath
         let tmp = await new Promise((resolve, reject) => {
             form.parse(req, (err, fields, files) => {
                 if (err) {
