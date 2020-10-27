@@ -447,7 +447,7 @@ export class TeamuserService {
 
     async deleteUser(userId){
         //删除用户信息
-        return await this.teamuserModel.delete({_id: mongoose.Types.ObjectId(userId)})
+        return await this.teamuserModel.deleteOne({_id: mongoose.Types.ObjectId(userId)})
     }
 
     async updatePassword(userId, oldPassword, newPassword){
@@ -668,6 +668,27 @@ export class TeamuserService {
         // console.log(stdout.toString())
         let rightStr = str.replace(/'/g, '"')
         return JSON.parse(rightStr)
+    }
+
+    //更新时间戳
+    async updateLatestDate(userId, projectName){
+        let userInfo = await this.teamuserModel.findById(mongoose.Types.ObjectId(userId))
+        let ProjList = userInfo.careProjectList
+        let mydate = new Date()  //为时间戳做准备
+
+        for(let key in ProjList){
+            if(ProjList[key].projectName == projectName){
+                ProjList[key].latestDate = mydate.getFullYear() + '-' + (mydate.getMonth() + 1) + '-' + mydate.getDate() //加入今天的时间戳
+            }
+        }
+
+        await this.teamuserModel.findOneAndUpdate(
+            {_id: mongoose.Types.ObjectId(userId)},
+            {careProjectList: ProjList},
+            {new: true}
+        )   //更新数据库中的时间，使用异步操作
+
+        return '时间戳更新完毕'
     }
 
 }

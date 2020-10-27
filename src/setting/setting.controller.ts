@@ -97,7 +97,7 @@ export class SettingController {
         return this.settingService.deleteManyByLayerId(layerId)
     }
 
-    @Put('insertUserSettingOfNewUser/:userId')
+    @Post('insertUserSettingOfNewUser/:userId')
     @ApiParam({
         name: 'userId',
         description: '请传入userId'

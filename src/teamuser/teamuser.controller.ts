@@ -317,4 +317,18 @@ export class TeamuserController {
     getAllInfo(@Query('projectName') projectName){
         return this.teamuserService.getAllInfo(projectName)
     }
+
+
+    //更新时间戳
+    @Get('updateLatestDate')
+    @ApiQuery({
+        name:'projectName'
+    })
+    @ApiQuery({
+        name:'userId'
+    })
+    @ApiOperation({summary:'更新关注项目的时间戳'})
+    updateLatestDate(@Query('userId') userId, @Query('projectName') projectName){
+        return this.teamuserService.updateLatestDate(userId, projectName)
+    }
 }
