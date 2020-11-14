@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, Put, Delete, UsePipes, ValidationPipe, UseGuards, Query } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Put, Delete, UsePipes, ValidationPipe, UseGuards, Query, Response} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { TeamuserService } from './teamuser.service';
 import { TeamuserDto, TeamPowerDto, IDListDto } from './dto/teamuser.dto';
@@ -330,5 +330,68 @@ export class TeamuserController {
     @ApiOperation({summary:'更新关注项目的时间戳'})
     updateLatestDate(@Query('userId') userId, @Query('projectName') projectName){
         return this.teamuserService.updateLatestDate(userId, projectName)
+    }
+
+    //公路信息爬虫
+    @Get('getGlxyInfo/:companyName')
+    @ApiParam({
+        name:'companyName'
+    })
+    @ApiOperation({summary:'获取公路局数据'})
+    async getGlxyInfo(@Param('companyName') companyName){
+        console.log('数据获取中！')
+        return await this.teamuserService.getGlxyInfo(companyName)
+    }
+    //发送公路信息表格
+    @Get('sendGlxyInfo/:companyName')
+    @ApiParam({
+        name:'companyName'
+    })
+    @ApiOperation({summary:'发送公路局数据'})
+    async sendGlxyInfo(@Param('companyName') companyName, @Response() res){
+        console.log('文件导出成功！')
+        res.setHeader('Content-Type', 'application/octet-stream')
+        res.send(await this.teamuserService.sendGlxyInfo(companyName))
+    }
+    //检测是否已存在表格
+    @Get('IsGlxyInfo/:companyName')
+    @ApiParam({
+        name:'companyName'
+    })
+    @ApiOperation({summary:'检测公路数据是否已存在'})
+    async IsGlxyInfo(@Param('companyName') companyName){
+        return await this.teamuserService.IsGlxyInfo(companyName)
+    }
+
+
+    //公路信息分sheet获取
+    @Get('getGlxyDetails/:companyName')
+    @ApiParam({
+        name:'companyName'
+    })
+    @ApiOperation({summary:'获取公路局数据分sheet详细'})
+    async getGlxyInfo_sheets(@Param('companyName') companyName){
+        console.log('正在获取数据！')
+        return await this.teamuserService.getGlxyInfo_sheets(companyName)
+    }
+    //公路信息分sheet发送
+    @Get('sendGlxyDetails/:companyName')
+    @ApiParam({
+        name:'companyName' 
+    })
+    @ApiOperation({summary:'发送公路局数据分sheet详细'})
+    async sendGlxyInfo_sheets(@Param('companyName') companyName, @Response() res){
+        console.log('文件导出成功！')
+        res.setHeader('Content-Type', 'application/octet-stream')
+        res.send(await this.teamuserService.sendGlxyInfo_sheets(companyName))
+    }
+    //检测是否已存在表格
+    @Get('IsGlxyInfoDetails/:companyName')
+    @ApiParam({
+        name:'companyName'
+    })
+    @ApiOperation({summary:'检测公路信息分sheet是否已存在'})
+    async IsGlxyInfo_sheets(@Param('companyName') companyName){
+        return await this.teamuserService.IsGlxyInfo_sheets(companyName)
     }
 }

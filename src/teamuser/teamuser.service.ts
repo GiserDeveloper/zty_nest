@@ -6,6 +6,8 @@ import { TeamuserDto } from './dto/teamuser.dto';
 
 import { Team } from '../team/schema/team.schema';
 import { Map } from 'src/map/schema/map.schema';
+// import { readFile } from 'fs';
+import { utils, read, readFile, write } from 'xlsx'
 
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
@@ -691,6 +693,61 @@ export class TeamuserService {
         return '时间戳更新完毕'
     }
 
+    //公路信息爬虫
+    async getGlxyInfo(companyName){ 
+        const {stdout, stderr} = await exec('python D:/teamuser/全国交通.py '+companyName, {encoding:'buffer'})
+        return true
+    }
+    //发送公路信息表格
+    async sendGlxyInfo(companyName){
+        let Workbook = await readFile('D:/zty_nest/public/交通表格/' + companyName + '(概览).xls')
+        //const Workbook = await readFile('D:/编程练习/VSCode/zty_nest-master/py.config/交通workbook/中铁大桥局集团有限公司(概览).xls')
+        let excelFIle = write(Workbook,{
+            bookType: 'xlsx', // 输出的文件类型
+            type: 'buffer', // 输出的数据类型
+            compression:true // 关闭zip压缩
+        })
+        return excelFIle
+    }
+    //检测是否存在表格
+    async IsGlxyInfo(companyName){
+        try{
+            let Workbook = await readFile('D:/zty_nest/public/交通表格/' + companyName + '(概览).xls')
+            let url = 'http://localhost:3000/public' + '/交通表格' + '/' +companyName + '(概览).xls'
+            return url
+        }
+        catch(err){
+            return false
+        }
+    }
+
+
+    //公路信息（分sheet）获取
+    async getGlxyInfo_sheets(companyName){
+        const {stdout, stderr} = await exec('python D:/teamuser/全国交通_sheet.py '+companyName, {encoding:'buffer'})
+        return true
+    }
+    //发送公路信息（分sheet）
+    async sendGlxyInfo_sheets(companyName){
+        let Workbook = await readFile('D:/zty_nest/public/交通表格/' + companyName + '(详情).xls')
+        let excelFIle = write(Workbook,{
+            bookType: 'xlsx', // 输出的文件类型
+            type: 'buffer', // 输出的数据类型
+            compression:true // 关闭zip压缩
+        })
+        return excelFIle
+    }
+    //检测是否存在表格
+    async IsGlxyInfo_sheets(companyName){
+        try{
+            let Workbook = await readFile('D:/zty_nest/public/交通表格/' + companyName + '(详情).xls')
+            let url = 'http://localhost:3000/public' + '/交通表格/' +  companyName + '(详情).xls'
+            return url
+        }
+        catch(err){
+            return false
+        }
+    }
 }
 
 

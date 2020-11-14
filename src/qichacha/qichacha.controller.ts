@@ -25,6 +25,7 @@ export class QichachaController {
     let databaseres = await this.qichachaService.getInfoOk(query.name)
     if(!databaseres){
         let qichachares = await chaAPI(query.name)
+        console.log(qichachares)
         return await this.qichachaService.insertData(qichachares.inputData, qichachares.originData)
     }
     return databaseres

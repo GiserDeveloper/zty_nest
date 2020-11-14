@@ -25,7 +25,7 @@ async function bootstrap() {
 
   // 静态资源配置
   app.use('/public',serveStatic(path.join(__dirname,'../public'),{
-    extensions: ['jpg', 'jpeg', 'png', 'gif']
+    extensions: ['jpg', 'jpeg', 'png', 'gif', 'xlxs', 'xls']
   }))
 
   //全局使用拦截器
